@@ -83,7 +83,7 @@ export async function POST(request: Request) {
         projectId: payload.projectId,
         assigneeId: payload.assignee ? parseInt(String(payload.assignee), 10) : null,
         assignedAt: payload.assignee ? nowISO : null,
-        attachment: ticket.url || null,
+        relevantLink: ticket.url || null,
       };
       ticketsToInsert.push(dataToStore);
       nextId++;
