@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Harry Botter Portal',
-  description: 'Modern ticket management portal',
+  description: 'TechTool Ticketing System',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
