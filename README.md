@@ -58,6 +58,34 @@ npm run build
 npm start
 ```
 
+## Deployment to Vercel
+
+1. **Push your code to GitHub/GitLab/Bitbucket**
+
+2. **Import your project to Vercel**:
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Import your repository
+
+3. **Configure Environment Variables**:
+   In your Vercel project settings, add these environment variables:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://xbjelezpuxkxcdmxbbih.supabase.co
+   NEXT_PUBLIC_SUPABASE_KEY=your_supabase_anon_key_here
+   ```
+   
+   **Important**: Replace `your_supabase_anon_key_here` with your actual Supabase anon key (the JWT token you have).
+
+4. **Deploy**:
+   - Vercel will automatically detect Next.js and deploy
+   - The build will run automatically on each push to your main branch
+
+### Troubleshooting Vercel Deployment
+
+- **Build fails**: Check that all environment variables are set in Vercel project settings
+- **Runtime errors**: Verify your Supabase credentials are correct
+- **PWA issues**: Service worker is disabled in development, test in production build
+
 ## Project Structure
 
 ```
