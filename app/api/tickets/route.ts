@@ -82,6 +82,8 @@ export async function POST(request: Request) {
         createdAt: nowISO,
         projectId: payload.projectId,
         assigneeId: payload.assignee ? parseInt(String(payload.assignee), 10) : null,
+        assignedAt: payload.assignee ? nowISO : null,
+        attachment: ticket.url || null,
       };
       ticketsToInsert.push(dataToStore);
       nextId++;
@@ -94,43 +96,6 @@ export async function POST(request: Request) {
 
     if (!insertedTickets || insertedTickets.length === 0) {
       throw new Error('Failed to insert tickets or retrieve their new IDs.');
-    }
-
-    // Handle attachments (files would need to be uploaded separately via another API)
-    // For now, we'll store URLs directly
-    const ticketsToUpdate = [];
-    for (const newTicket of insertedTickets) {
-      const originalTicketPayload = payload.tickets.find(
-        (p) => p.title === newTicket.title
-      );
-      if (!originalTicketPayload || !originalTicketPayload.attachments || originalTicketPayload.attachments.length === 0) continue;
-
-      const attachmentUrls: string[] = [];
-      originalTicketPayload.attachments.forEach((att) => {
-        if (att.type === 'url') {
-          attachmentUrls.push(att.data as string);
-        } else if (att.type === 'file') {
-          // File uploads would need to be handled separately
-          // For now, we'll skip file attachments in the API route
-        }
-      });
-
-      if (attachmentUrls.length > 0) {
-        ticketsToUpdate.push({
-          id: newTicket.id,
-          relevantLink: attachmentUrls.join('\n'),
-        });
-      }
-    }
-
-    if (ticketsToUpdate.length > 0) {
-      for (const ticketToUpdate of ticketsToUpdate) {
-        await supabaseRequest('ticket', {
-          method: 'PATCH',
-          params: `id=eq.${ticketToUpdate.id}`,
-          payload: { relevantLink: ticketToUpdate.relevantLink },
-        });
-      }
     }
 
     // Send Discord notification

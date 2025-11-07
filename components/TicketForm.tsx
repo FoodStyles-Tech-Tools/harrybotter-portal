@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
 import type { User, TeamMember, Project, TicketFormData } from '@/types';
@@ -38,19 +38,52 @@ export default function TicketForm({
   onReset
 }: TicketFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rephrasingIndex, setRephrasingIndex] = useState<number | null>(null);
+  const [rephraseResult, setRephraseResult] = useState<{
+    taskName: string;
+    description: string;
+    url: string;
+  } | null>(null);
+  const [isRephrasing, setIsRephrasing] = useState(false);
 
   // Use controlled state if provided, otherwise use local state
   const [localRequester, setLocalRequester] = useState<DropdownOption | null>(null);
   const [localProject, setLocalProject] = useState<DropdownOption | null>(null);
   const [localAssignee, setLocalAssignee] = useState<DropdownOption | null>(null);
   const [localTickets, setLocalTickets] = useState<TicketFormData[]>([
-    { title: '', description: '', type: 'Request', priority: 'Medium', attachments: [] },
+    { title: '', description: '', url: '', type: 'Request', priority: 'Medium', attachments: [] },
   ]);
 
   const requester = formState?.requester ?? localRequester;
   const project = formState?.project ?? localProject;
   const assignee = formState?.assignee ?? localAssignee;
   const tickets = formState?.tickets ?? localTickets;
+
+  // Warn when page refresh/close during rephrase
+  useEffect(() => {
+    if (isRephrasing) {
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = 'Rephrase operation is in progress. Are you sure you want to leave?';
+        return e.returnValue;
+      };
+
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+    }
+  }, [isRephrasing]);
+
+  // Expose rephrasing state to parent for tab switching warning
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isRephrasing) {
+      // Store in a way parent can check
+      (window as any).__isRephrasing = true;
+    } else {
+      (window as any).__isRephrasing = false;
+    }
+  }, [isRephrasing]);
 
   const updateState = (updates: Partial<{
     requester: DropdownOption | null;
@@ -77,7 +110,7 @@ export default function TicketForm({
   const addTicketRow = () => {
     const newTickets = [
       ...tickets,
-      { title: '', description: '', type: 'Request', priority: 'Medium', attachments: [] },
+      { title: '', description: '', url: '', type: 'Request', priority: 'Medium', attachments: [] },
     ];
     updateState({ tickets: newTickets });
   };
@@ -93,6 +126,72 @@ export default function TicketForm({
     const updated = [...tickets];
     updated[index] = { ...updated[index], [field]: value };
     updateState({ tickets: updated });
+  };
+
+  const handleRephrase = async (index: number) => {
+    const ticket = tickets[index];
+    if (!ticket.description || !ticket.description.trim()) {
+      alert('Please enter a description to rephrase.');
+      return;
+    }
+
+    setIsRephrasing(true);
+    setRephrasingIndex(index);
+    setRephraseResult(null);
+
+    try {
+      const response = await fetch('/api/rephrase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: ticket.description }),
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setRephraseResult({
+        taskName: data.taskName,
+        description: data.description,
+        url: data.url || '',
+      });
+    } catch (error: any) {
+      alert(`Failed to rephrase: ${error.message}`);
+      setRephrasingIndex(null);
+    } finally {
+      setIsRephrasing(false);
+    }
+  };
+
+  const handleAcceptRephrase = (index: number) => {
+    if (!rephraseResult) return;
+
+    const updated = [...tickets];
+    updated[index] = {
+      ...updated[index],
+      title: rephraseResult.taskName,
+      description: rephraseResult.description,
+      url: rephraseResult.url || '',
+    };
+    
+    updateState({ tickets: updated });
+    setRephraseResult(null);
+    setRephrasingIndex(null);
+    
+    // Auto-grow description field after accepting
+    setTimeout(() => {
+      const textarea = document.querySelector(`textarea[data-ticket-index="${index}"][data-field="description"]`) as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      }
+    }, 0);
+  };
+
+  const handleRejectRephrase = () => {
+    setRephraseResult(null);
+    setRephrasingIndex(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -128,7 +227,7 @@ export default function TicketForm({
         requester: null,
         project: null,
         assignee: null,
-        tickets: [{ title: '', description: '', type: 'Request', priority: 'Medium', attachments: [] }],
+        tickets: [{ title: '', description: '', url: '', type: 'Request', priority: 'Medium', attachments: [] }],
       };
       updateState(resetState);
       if (onReset) {
@@ -215,10 +314,10 @@ export default function TicketForm({
                 <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">
                   Details *
                 </th>
-                <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">
+                <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold text-gray-700" style={{ width: '12%' }}>
                   Type
                 </th>
-                <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">
+                <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold text-gray-700" style={{ width: '12%' }}>
                   Priority
                 </th>
                 <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-700 w-20">
@@ -235,31 +334,147 @@ export default function TicketForm({
                   className="hover:bg-gray-50"
                 >
                   <td className="border border-gray-300 px-3 py-2">
-                    <textarea
-                      value={ticket.title}
-                      onChange={(e) => updateTicket(index, 'title', e.target.value)}
-                      placeholder="Describe the bug or feature request..."
-                      required
-                      rows={2}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                    <div className="space-y-2">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Ticket *</label>
+                        <textarea
+                          value={ticket.title}
+                          onChange={(e) => updateTicket(index, 'title', e.target.value)}
+                          placeholder="Task title..."
+                          required
+                          rows={2}
+                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
+                        <div className="border border-blue-200 rounded p-2 bg-blue-50">
+                          <textarea
+                            data-ticket-index={index}
+                            data-field="description"
+                            value={ticket.description}
+                            onChange={(e) => {
+                              updateTicket(index, 'description', e.target.value);
+                              // Auto-grow functionality
+                              e.target.style.height = 'auto';
+                              e.target.style.height = `${e.target.scrollHeight}px`;
+                            }}
+                            onInput={(e) => {
+                              // Auto-grow on input
+                              const target = e.target as HTMLTextAreaElement;
+                              target.style.height = 'auto';
+                              target.style.height = `${target.scrollHeight}px`;
+                            }}
+                            placeholder="Describe the task in detail..."
+                            rows={3}
+                            className="w-full px-2 py-1 text-sm border-0 bg-transparent focus:outline-none focus:ring-0 resize-none min-h-[60px]"
+                            style={{ overflow: 'hidden' }}
+                          />
+                          <div className="flex justify-end mt-2">
+                            <button
+                              type="button"
+                              onClick={() => handleRephrase(index)}
+                              disabled={isRephrasing || !ticket.description?.trim()}
+                              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              {isRephrasing && rephrasingIndex === index ? (
+                                <>
+                                  <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                  </svg>
+                                  Rephrasing...
+                                </>
+                              ) : (
+                                <>
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                  </svg>
+                                  <span>Rephrase &amp; Refine</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Url</label>
+                        <input
+                          type="url"
+                          value={ticket.url || ''}
+                          onChange={(e) => updateTicket(index, 'url', e.target.value)}
+                          placeholder="https://..."
+                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      {rephraseResult && rephrasingIndex === index && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                        >
+                          <div className="space-y-2">
+                            <div>
+                              <p className="text-xs font-semibold text-gray-700 mb-1">Task Name:</p>
+                              <p className="text-sm text-gray-900">{rephraseResult.taskName}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold text-gray-700 mb-1">Description:</p>
+                              <p className="text-sm text-gray-900">{rephraseResult.description}</p>
+                            </div>
+                            {rephraseResult.url && rephraseResult.url.trim() && (
+                              <div>
+                                <p className="text-xs font-semibold text-gray-700 mb-1">URL:</p>
+                                <p className="text-sm text-blue-600 break-all">
+                                  <a href={rephraseResult.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                    {rephraseResult.url}
+                                  </a>
+                                </p>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-2 pt-2">
+                              <button
+                                type="button"
+                                onClick={() => handleAcceptRephrase(index)}
+                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 transition-colors"
+                              >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                Accept
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleRejectRephrase}
+                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
+                              >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
                   </td>
-                  <td className="border border-gray-300 px-3 py-2">
+                  <td className="border border-gray-300 px-2 py-2" style={{ width: '12%' }}>
                     <select
                       value={ticket.type}
                       onChange={(e) => updateTicket(index, 'type', e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-1 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="Request">Request</option>
                       <option value="Bug">Bug</option>
                       <option value="Task">Task</option>
                     </select>
                   </td>
-                  <td className="border border-gray-300 px-3 py-2">
+                  <td className="border border-gray-300 px-2 py-2" style={{ width: '12%' }}>
                     <select
                       value={ticket.priority}
                       onChange={(e) => updateTicket(index, 'priority', e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-1 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="Urgent">Urgent</option>
                       <option value="High">High</option>

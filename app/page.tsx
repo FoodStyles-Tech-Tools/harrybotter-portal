@@ -12,6 +12,19 @@ import type { DropdownOption } from '@/components/SearchableDropdown';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'submit' | 'check'>('submit');
+  
+  const handleTabChange = (tab: 'submit' | 'check') => {
+    // Check if rephrase is in progress
+    if (typeof window !== 'undefined' && (window as any).__isRephrasing) {
+      const confirmLeave = window.confirm(
+        'Rephrase operation is in progress. Are you sure you want to switch tabs? The rephrase operation will be cancelled.'
+      );
+      if (!confirmLeave) {
+        return; // Don't switch tabs
+      }
+    }
+    setActiveTab(tab);
+  };
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const { toasts, success, error, removeToast } = useToast();
   
@@ -140,7 +153,7 @@ export default function Home() {
         >
           <header className="px-6 py-5 border-b border-gray-200">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Harry Botter Portal</h1>
-            <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+            <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
           </header>
 
           <main className="p-6">

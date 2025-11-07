@@ -34,6 +34,7 @@ export interface Ticket {
 export interface TicketFormData {
   title: string;
   description: string;
+  url?: string;
   type: 'Request' | 'Bug' | 'Task';
   priority: 'Urgent' | 'High' | 'Medium' | 'Low';
   attachments: Attachment[];
