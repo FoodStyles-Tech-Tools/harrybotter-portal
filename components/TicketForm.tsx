@@ -51,7 +51,7 @@ export default function TicketForm({
   const [localProject, setLocalProject] = useState<DropdownOption | null>(null);
   const [localAssignee, setLocalAssignee] = useState<DropdownOption | null>(null);
   const [localTickets, setLocalTickets] = useState<TicketFormData[]>([
-    { title: '', description: '', url: '', type: 'Request', priority: 'Medium', attachments: [] },
+    { title: '', description: '', url: '', type: 'Request' as const, priority: 'Medium' as const, attachments: [] },
   ]);
 
   const requester = formState?.requester ?? localRequester;
@@ -108,10 +108,15 @@ export default function TicketForm({
 
 
   const addTicketRow = () => {
-    const newTickets = [
-      ...tickets,
-      { title: '', description: '', url: '', type: 'Request', priority: 'Medium', attachments: [] },
-    ];
+    const newTicket: TicketFormData = {
+      title: '',
+      description: '',
+      url: '',
+      type: 'Request',
+      priority: 'Medium',
+      attachments: [],
+    };
+    const newTickets = [...tickets, newTicket];
     updateState({ tickets: newTickets });
   };
 
@@ -223,11 +228,19 @@ export default function TicketForm({
       });
 
       // Only reset form after successful submission
+      const resetTicket: TicketFormData = {
+        title: '',
+        description: '',
+        url: '',
+        type: 'Request',
+        priority: 'Medium',
+        attachments: [],
+      };
       const resetState = {
         requester: null,
         project: null,
         assignee: null,
-        tickets: [{ title: '', description: '', url: '', type: 'Request', priority: 'Medium', attachments: [] }],
+        tickets: [resetTicket],
       };
       updateState(resetState);
       if (onReset) {
