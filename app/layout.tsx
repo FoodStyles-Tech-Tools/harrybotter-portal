@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
@@ -8,13 +8,18 @@ export const metadata: Metadata = {
   title: 'Harry Botter Portal',
   description: 'Modern ticket management portal',
   manifest: '/manifest.json',
-  themeColor: '#007aff',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'Harry Botter Portal',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#007aff',
 };
 
 export default function RootLayout({

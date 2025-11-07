@@ -3,6 +3,9 @@
 import { Suspense, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
+// Force dynamic rendering to avoid prerendering issues
+export const dynamic = 'force-dynamic';
+
 function AllTicketsRedirect() {
   const searchParams = useSearchParams();
   const router = useRouter();
