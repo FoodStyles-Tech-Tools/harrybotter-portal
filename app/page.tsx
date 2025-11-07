@@ -121,7 +121,7 @@ export default function Home() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">Submit New Tickets</h2>
                   <p className="text-sm text-gray-600">
                     Use this section to request features, report bugs, or ask for assistance. Add
-                    multiple tickets easily using the '+' button in each row.
+                    multiple tickets easily using the &apos;+&apos; button in each row.
                   </p>
                 </div>
                 <TicketForm 
