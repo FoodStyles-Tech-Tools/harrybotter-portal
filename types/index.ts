@@ -53,7 +53,7 @@ export interface FileData {
 
 export interface TicketSubmissionPayload {
   requester: string;
-  requesterEmail: string;
+  requesterEmail?: string; // Optional - not stored in database
   tickets: TicketFormData[];
   projectId?: number | null;
   assignee?: number | null;

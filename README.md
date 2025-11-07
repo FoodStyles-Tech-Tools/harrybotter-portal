@@ -40,9 +40,14 @@ npm install
 # Copy .env.example to .env.local and fill in your values
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_KEY=your_supabase_anon_key
+DISCORD_WEBHOOK_URL=your_discord_webhook_url
+NEXT_PUBLIC_WEB_APP_URL=https://techtool-app.vercel.app
 ```
 
-**Important**: The `.env.local` file is required for the app to work. Get your Supabase credentials from your Supabase project settings: https://app.supabase.com/project/_/settings/api
+**Important**: 
+- The `.env.local` file is required for the app to work. Get your Supabase credentials from your Supabase project settings: https://app.supabase.com/project/_/settings/api
+- `DISCORD_WEBHOOK_URL` is optional but required for Discord notifications when tickets are created
+- `NEXT_PUBLIC_WEB_APP_URL` is optional and defaults to `https://techtool-app.vercel.app` if not set
 
 3. Run the development server:
 ```bash
@@ -72,9 +77,14 @@ npm start
    ```
    NEXT_PUBLIC_SUPABASE_URL=https://xbjelezpuxkxcdmxbbih.supabase.co
    NEXT_PUBLIC_SUPABASE_KEY=your_supabase_anon_key_here
+   DISCORD_WEBHOOK_URL=your_discord_webhook_url
+   NEXT_PUBLIC_WEB_APP_URL=https://techtool-app.vercel.app
    ```
    
-   **Important**: Replace `your_supabase_anon_key_here` with your actual Supabase anon key (the JWT token you have).
+   **Important**: 
+   - Replace `your_supabase_anon_key_here` with your actual Supabase anon key (the JWT token you have)
+   - `DISCORD_WEBHOOK_URL` is optional but required for Discord notifications when tickets are created
+   - `NEXT_PUBLIC_WEB_APP_URL` is optional and defaults to `https://techtool-app.vercel.app` if not set
 
 4. **Deploy**:
    - Vercel will automatically detect Next.js and deploy

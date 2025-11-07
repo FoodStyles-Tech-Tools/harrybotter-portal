@@ -11,6 +11,20 @@ interface TicketFormProps {
   initialTeamMembers?: TeamMember[];
   initialProjects?: Project[];
   isLoading?: boolean;
+  // Controlled form state (optional - for persistence across tab switches)
+  formState?: {
+    requester: DropdownOption | null;
+    project: DropdownOption | null;
+    assignee: DropdownOption | null;
+    tickets: TicketFormData[];
+  };
+  onFormStateChange?: (state: {
+    requester: DropdownOption | null;
+    project: DropdownOption | null;
+    assignee: DropdownOption | null;
+    tickets: TicketFormData[];
+  }) => void;
+  onReset?: () => void;
 }
 
 export default function TicketForm({ 
@@ -18,35 +32,67 @@ export default function TicketForm({
   initialUsers = [], 
   initialTeamMembers = [], 
   initialProjects = [],
-  isLoading = false 
+  isLoading = false,
+  formState,
+  onFormStateChange,
+  onReset
 }: TicketFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [requester, setRequester] = useState<DropdownOption | null>(null);
-  const [project, setProject] = useState<DropdownOption | null>(null);
-  const [assignee, setAssignee] = useState<DropdownOption | null>(null);
-  const [tickets, setTickets] = useState<TicketFormData[]>([
+  // Use controlled state if provided, otherwise use local state
+  const [localRequester, setLocalRequester] = useState<DropdownOption | null>(null);
+  const [localProject, setLocalProject] = useState<DropdownOption | null>(null);
+  const [localAssignee, setLocalAssignee] = useState<DropdownOption | null>(null);
+  const [localTickets, setLocalTickets] = useState<TicketFormData[]>([
     { title: '', description: '', type: 'Request', priority: 'Medium', attachments: [] },
   ]);
 
+  const requester = formState?.requester ?? localRequester;
+  const project = formState?.project ?? localProject;
+  const assignee = formState?.assignee ?? localAssignee;
+  const tickets = formState?.tickets ?? localTickets;
+
+  const updateState = (updates: Partial<{
+    requester: DropdownOption | null;
+    project: DropdownOption | null;
+    assignee: DropdownOption | null;
+    tickets: TicketFormData[];
+  }>) => {
+    if (onFormStateChange) {
+      onFormStateChange({
+        requester: updates.requester ?? requester,
+        project: updates.project ?? project,
+        assignee: updates.assignee ?? assignee,
+        tickets: updates.tickets ?? tickets,
+      });
+    } else {
+      if (updates.requester !== undefined) setLocalRequester(updates.requester);
+      if (updates.project !== undefined) setLocalProject(updates.project);
+      if (updates.assignee !== undefined) setLocalAssignee(updates.assignee);
+      if (updates.tickets !== undefined) setLocalTickets(updates.tickets);
+    }
+  };
+
 
   const addTicketRow = () => {
-    setTickets([
+    const newTickets = [
       ...tickets,
       { title: '', description: '', type: 'Request', priority: 'Medium', attachments: [] },
-    ]);
+    ];
+    updateState({ tickets: newTickets });
   };
 
   const removeTicketRow = (index: number) => {
     if (tickets.length > 1) {
-      setTickets(tickets.filter((_, i) => i !== index));
+      const newTickets = tickets.filter((_, i) => i !== index);
+      updateState({ tickets: newTickets });
     }
   };
 
   const updateTicket = (index: number, field: keyof TicketFormData, value: any) => {
     const updated = [...tickets];
     updated[index] = { ...updated[index], [field]: value };
-    setTickets(updated);
+    updateState({ tickets: updated });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,15 +123,20 @@ export default function TicketForm({
         assigneeName: assignee ? assignee.name : null,
       });
 
-      // Reset form
-      setRequester(null);
-      setProject(null);
-      setAssignee(null);
-      setTickets([
-        { title: '', description: '', type: 'Request', priority: 'Medium', attachments: [] },
-      ]);
+      // Only reset form after successful submission
+      const resetState = {
+        requester: null,
+        project: null,
+        assignee: null,
+        tickets: [{ title: '', description: '', type: 'Request', priority: 'Medium', attachments: [] }],
+      };
+      updateState(resetState);
+      if (onReset) {
+        onReset();
+      }
     } catch (error: any) {
-      alert(`Error: ${error.message}`);
+      // Don't reset form on error - keep the data so user can retry
+      // Error is already shown via toast notification
     } finally {
       setIsSubmitting(false);
     }
@@ -110,7 +161,7 @@ export default function TicketForm({
             options={userOptions}
             placeholder="Select requester..."
             value={requester?.id}
-            onSelect={setRequester}
+            onSelect={(value) => updateState({ requester: value })}
             isLoading={isLoading}
           />
         </div>
@@ -122,7 +173,7 @@ export default function TicketForm({
             options={projectOptions}
             placeholder="Select project..."
             value={project?.id}
-            onSelect={setProject}
+            onSelect={(value) => updateState({ project: value })}
             allowClear
             isLoading={isLoading}
           />
@@ -135,7 +186,7 @@ export default function TicketForm({
             options={assigneeOptions}
             placeholder="Select assignee..."
             value={assignee?.id}
-            onSelect={setAssignee}
+            onSelect={(value) => updateState({ assignee: value })}
             allowClear
             isLoading={isLoading}
           />

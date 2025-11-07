@@ -5,11 +5,15 @@ import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 import TicketForm from '@/components/TicketForm';
 import TicketList from '@/components/TicketList';
-import type { Ticket, User, TeamMember, Project } from '@/types';
+import ToastContainer from '@/components/Toast';
+import { useToast } from '@/hooks/useToast';
+import type { Ticket, User, TeamMember, Project, TicketFormData } from '@/types';
+import type { DropdownOption } from '@/components/SearchableDropdown';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'submit' | 'check'>('submit');
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const { toasts, success, error, removeToast } = useToast();
   
   // Cache form data to prevent reloading
   const [users, setUsers] = useState<User[]>([]);
@@ -17,6 +21,14 @@ export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [formDataLoaded, setFormDataLoaded] = useState(false);
   const [ticketsLoaded, setTicketsLoaded] = useState(false);
+
+  // Form state for persistence across tab switches
+  const [formState, setFormState] = useState<{
+    requester: DropdownOption | null;
+    project: DropdownOption | null;
+    assignee: DropdownOption | null;
+    tickets: TicketFormData[];
+  } | null>(null);
 
   // Load form data once on mount
   useEffect(() => {
@@ -64,35 +76,57 @@ export default function Home() {
     loadTickets();
   }, [ticketsLoaded]);
 
-  // Check if there's a viewTicket parameter in the URL
+  // Check if there's a ticket parameter in the URL
+  const [initialTicketId, setInitialTicketId] = useState<string | null>(null);
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      const viewTicket = params.get('viewTicket');
-      if (viewTicket) {
+      const ticketParam = params.get('ticket');
+      if (ticketParam) {
         setActiveTab('check');
+        // Extract ticket ID (handle both "1279" and "HRB-1279" formats)
+        const ticketId = ticketParam.replace(/^HRB-/i, '');
+        setInitialTicketId(ticketId);
       }
     }
   }, []);
 
   const handleTicketSubmit = async (payload: any) => {
-    const response = await fetch('/api/tickets', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const response = await fetch('/api/tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    const data = await response.json();
-    if (data.error) {
-      throw new Error(data.error);
-    }
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
-    alert(data.message);
-    // Refresh ticket list if on check tab
-    if (activeTab === 'check') {
+      // Show success notification
+      success(data.message || 'Ticket(s) submitted successfully!');
+      
+      // Refresh ticket list
       const ticketsRes = await fetch('/api/tickets');
       const ticketsData = await ticketsRes.json();
       setTickets(ticketsData);
+      setTicketsLoaded(true);
+      
+      // Switch to "Check Ticket" tab and filter to show the newly created ticket(s)
+      setActiveTab('check');
+      
+      // If only one ticket was created, filter to show it
+      if (data.ticketIds && data.ticketIds.length === 1) {
+        setInitialTicketId(String(data.ticketIds[0]));
+      } else if (data.ticketIds && data.ticketIds.length > 1) {
+        // If multiple tickets, show the first one
+        setInitialTicketId(String(data.ticketIds[0]));
+      }
+    } catch (err: any) {
+      error(err.message || 'Failed to submit ticket(s). Please try again.');
+      throw err;
     }
   };
 
@@ -130,6 +164,9 @@ export default function Home() {
                   initialTeamMembers={teamMembers}
                   initialProjects={projects}
                   isLoading={!formDataLoaded}
+                  formState={formState || undefined}
+                  onFormStateChange={setFormState}
+                  onReset={() => setFormState(null)}
                 />
               </motion.div>
             ) : (
@@ -145,6 +182,7 @@ export default function Home() {
                 <TicketList 
                   initialTickets={tickets} 
                   initialProjects={projects}
+                  initialTicketIdFilter={initialTicketId}
                   onRefresh={() => {
                     setTicketsLoaded(false);
                   }}
@@ -154,6 +192,7 @@ export default function Home() {
           </main>
         </motion.div>
       </div>
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </div>
   );
 }

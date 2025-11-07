@@ -25,10 +25,11 @@ const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
 interface TicketListProps {
   initialTickets?: Ticket[];
   initialProjects?: Array<{ id: number; name: string }>;
+  initialTicketIdFilter?: string | null;
   onRefresh?: () => void;
 }
 
-export default function TicketList({ initialTickets = [], initialProjects = [], onRefresh }: TicketListProps) {
+export default function TicketList({ initialTickets = [], initialProjects = [], initialTicketIdFilter, onRefresh }: TicketListProps) {
   const [tickets, setTickets] = useState<Ticket[]>(initialTickets);
   const [isLoading, setIsLoading] = useState(!initialTickets.length);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
@@ -36,7 +37,7 @@ export default function TicketList({ initialTickets = [], initialProjects = [], 
   const [copiedTicketId, setCopiedTicketId] = useState<number | null>(null);
 
   // Filters
-  const [ticketIdFilter, setTicketIdFilter] = useState('');
+  const [ticketIdFilter, setTicketIdFilter] = useState(initialTicketIdFilter || '');
   const [searchFilter, setSearchFilter] = useState('');
   const [requesterFilter, setRequesterFilter] = useState<DropdownOption | null>(null);
   const [projectFilter, setProjectFilter] = useState<DropdownOption | null>(null);
@@ -70,6 +71,13 @@ export default function TicketList({ initialTickets = [], initialProjects = [], 
       setIsLoading(false);
     }
   }, [initialTickets]);
+
+  // Update ticket ID filter when initialTicketIdFilter changes
+  useEffect(() => {
+    if (initialTicketIdFilter) {
+      setTicketIdFilter(initialTicketIdFilter);
+    }
+  }, [initialTicketIdFilter]);
 
   const requesters = useMemo(() => {
     const unique = Array.from(new Set(tickets.map((t) => t.requestedBy).filter(Boolean)));

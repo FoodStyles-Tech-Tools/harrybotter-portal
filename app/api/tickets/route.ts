@@ -81,7 +81,6 @@ export async function POST(request: Request) {
         status: 'Open',
         createdAt: nowISO,
         projectId: payload.projectId,
-        requesterEmail: payload.requesterEmail,
         assigneeId: payload.assignee ? parseInt(String(payload.assignee), 10) : null,
       };
       ticketsToInsert.push(dataToStore);
@@ -134,8 +133,89 @@ export async function POST(request: Request) {
       }
     }
 
-    // Send Discord notification (would need to be done server-side)
-    // This would require a separate API route or server action
+    // Send Discord notification
+    const discordWebhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    if (discordWebhookUrl) {
+      try {
+        const ticketCount = insertedTickets.length;
+        const pluralS = ticketCount > 1 ? 's' : '';
+        let assigneeDiscordId = null;
+        let contentMessage = '';
+
+        // Determine assignee and content ping
+        if (payload.assignee) {
+          try {
+            const userData = await supabaseRequest('user', {
+              params: `select=discordId&id=eq.${payload.assignee}`,
+            });
+            if (userData && userData.length > 0 && userData[0].discordId) {
+              assigneeDiscordId = userData[0].discordId;
+              contentMessage = `Hi <@${assigneeDiscordId}>, a new ticket has been assigned to you.`;
+            }
+          } catch (e) {
+            console.error('Could not fetch discordId for assignee', e);
+          }
+        }
+
+        if (!contentMessage && payload.assigneeName) {
+          // Assignee was selected but not found in Discord, so mention by name
+          contentMessage = `Hi ${payload.assigneeName}, a new ticket has been assigned to you.`;
+        } else if (!contentMessage) {
+          // No assignee, use default message
+          contentMessage = `${payload.requester} created ${ticketCount} new ticket${pluralS}!`;
+        }
+
+        // Build the description for the embed
+        const webAppUrl = process.env.NEXT_PUBLIC_WEB_APP_URL || 'https://techtool-app.vercel.app';
+        const description = insertedTickets.map((ticket: any) => {
+          const ticketUrl = `${webAppUrl}/all-tickets?ticket=HRB-${ticket.id}`;
+          const ticketLink = `[**[HRB-${ticket.id}] - ${ticket.title}**](${ticketUrl})`;
+
+          const assigneeText = payload.assigneeName
+            ? `Assignee: **${payload.assigneeName}**`
+            : 'Assignee: Unassigned';
+
+          const detailsText = `Type: ${ticket.type} | Priority: ${ticket.priority}`;
+
+          return `${ticketLink}\n${assigneeText}\n${detailsText}`;
+        }).join('\n\n');
+
+        // Construct the embed object
+        const embed = {
+          author: {
+            name: `${payload.requester} created ${ticketCount} new ticket${pluralS}!`,
+          },
+          description: description,
+          color: 31415, // #007aff
+          footer: {
+            text: 'TechTool Notification System',
+          },
+          timestamp: new Date().toISOString(),
+        };
+
+        // Construct the final payload for Discord
+        const discordPayload = {
+          username: 'HarryBotter APP',
+          avatar_url: 'https://drive.google.com/uc?export=download&id=1LE0v5c_VUERk5ZhW4laTa2S-A0pLcRnd',
+          content: contentMessage,
+          embeds: [embed],
+        };
+
+        // Send Discord notification
+        const discordResponse = await fetch(discordWebhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(discordPayload),
+        });
+
+        if (!discordResponse.ok) {
+          console.error('Failed to send Discord notification:', await discordResponse.text());
+        }
+      } catch (error: any) {
+        console.error('Error sending Discord notification:', error);
+        // Don't fail the request if Discord notification fails
+      }
+    }
 
     return NextResponse.json({
       message: `${insertedTickets.length} ticket(s) submitted successfully!`,
