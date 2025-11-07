@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function AllTicketsPage() {
+function AllTicketsRedirect() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -25,6 +25,20 @@ export default function AllTicketsPage() {
         <p className="text-gray-600">Redirecting...</p>
       </div>
     </div>
+  );
+}
+
+export default function AllTicketsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <AllTicketsRedirect />
+    </Suspense>
   );
 }
 
