@@ -7,6 +7,7 @@ export interface DropdownOption {
   id?: number | string;
   name: string;
   email?: string;
+  avatar_url?: string;
 }
 
 interface SearchableDropdownProps {
@@ -97,32 +98,45 @@ export default function SearchableDropdown({
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <div className="relative">
-        <input
-          ref={inputRef}
-          type="text"
-          value={isOpen ? searchTerm : selectedOption?.name || ''}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setIsOpen(true);
-            setHighlightedIndex(-1);
-          }}
-          onFocus={() => setIsOpen(true)}
-          onKeyDown={handleKeyDown}
-          placeholder={isLoading ? 'Loading...' : placeholder}
-          disabled={isLoading}
-          className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-            isLoading ? 'bg-gray-100 animate-pulse' : 'bg-white'
-          } ${allowClear && selectedOption ? 'pr-8' : ''}`}
-        />
-        {allowClear && selectedOption && !isLoading && (
-          <button
-            type="button"
-            onClick={handleClear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xl leading-none"
-          >
-            ×
-          </button>
-        )}
+        <div className="relative flex items-center">
+          {selectedOption?.avatar_url && !isOpen && (
+            <img
+              src={selectedOption.avatar_url}
+              alt={selectedOption.name}
+              className="absolute left-3 w-6 h-6 rounded-full object-cover"
+              onError={(e) => {
+                // Hide image if it fails to load
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          )}
+          <input
+            ref={inputRef}
+            type="text"
+            value={isOpen ? searchTerm : selectedOption?.name || ''}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setIsOpen(true);
+              setHighlightedIndex(-1);
+            }}
+            onFocus={() => setIsOpen(true)}
+            onKeyDown={handleKeyDown}
+            placeholder={isLoading ? 'Loading...' : placeholder}
+            disabled={isLoading}
+            className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              isLoading ? 'bg-gray-100 animate-pulse' : 'bg-white'
+            } ${selectedOption?.avatar_url && !isOpen ? 'pl-10' : ''} ${allowClear && selectedOption ? 'pr-8' : ''}`}
+          />
+          {allowClear && selectedOption && !isLoading && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xl leading-none"
+            >
+              ×
+            </button>
+          )}
+        </div>
       </div>
 
       <AnimatePresence>
@@ -139,16 +153,34 @@ export default function SearchableDropdown({
                 key={option.id || option.name}
                 onClick={() => handleSelect(option)}
                 onMouseEnter={() => setHighlightedIndex(index)}
-                className={`px-3 py-2 cursor-pointer transition-colors ${
+                className={`px-3 py-2 cursor-pointer transition-colors flex items-center gap-3 ${
                   highlightedIndex === index
                     ? 'bg-blue-50'
                     : 'hover:bg-gray-50'
                 }`}
               >
-                <div className="font-medium text-sm text-gray-900">{option.name}</div>
-                {option.email && (
-                  <div className="text-xs text-gray-500 mt-0.5">{option.email}</div>
+                {option.avatar_url && (
+                  <img
+                    src={option.avatar_url}
+                    alt={option.name}
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                    onError={(e) => {
+                      // Hide image if it fails to load
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
                 )}
+                {!option.avatar_url && (
+                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs font-medium flex-shrink-0">
+                    {option.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm text-gray-900 truncate">{option.name}</div>
+                  {option.email && (
+                    <div className="text-xs text-gray-500 mt-0.5 truncate">{option.email}</div>
+                  )}
+                </div>
               </div>
             ))}
           </motion.div>

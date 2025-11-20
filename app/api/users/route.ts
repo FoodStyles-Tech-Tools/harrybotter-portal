@@ -4,12 +4,20 @@ import type { User } from '@/types';
 
 export async function GET() {
   try {
-    const data = await supabaseRequest('member', {
-      params: 'select=clockify_name,email',
+    const data = await supabaseRequest('users', {
+      params: 'select=id,name,email',
     });
     
     const users: User[] = data
-      .map((row: any) => ({ name: row.clockify_name, email: row.email }))
+      .map((row: any) => ({ 
+        id: row.id,
+        name: row.name, 
+        email: row.email,
+        avatar_url: row.avatar_url,
+        role: row.role,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+      }))
       .filter((user: User) => user.name);
 
     return NextResponse.json(users);

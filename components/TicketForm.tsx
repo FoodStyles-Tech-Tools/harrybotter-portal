@@ -222,8 +222,8 @@ export default function TicketForm({
         requester: requester.name,
         requesterEmail,
         tickets: validTickets,
-        projectId: project ? Number(project.id) : null,
-        assignee: assignee ? Number(assignee.id) : null,
+        projectId: project ? String(project.id) : null,
+        assignee: assignee ? String(assignee.id) : null,
         assigneeName: assignee ? assignee.name : null,
       });
 
@@ -260,6 +260,7 @@ export default function TicketForm({
     id: m.id,
     name: m.name,
     email: m.email,
+    avatar_url: m.avatar_url,
   }));
 
   return (

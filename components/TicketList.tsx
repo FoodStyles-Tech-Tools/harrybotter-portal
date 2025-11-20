@@ -34,7 +34,7 @@ export default function TicketList({ initialTickets = [], initialProjects = [], 
   const [isLoading, setIsLoading] = useState(!initialTickets.length);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [copiedTicketId, setCopiedTicketId] = useState<number | null>(null);
+  const [copiedTicketId, setCopiedTicketId] = useState<string | null>(null);
 
   // Filters
   const [ticketIdFilter, setTicketIdFilter] = useState(initialTicketIdFilter || '');
@@ -94,7 +94,9 @@ export default function TicketList({ initialTickets = [], initialProjects = [], 
       // Ticket ID filter
       if (ticketIdFilter) {
         const idStr = ticketIdFilter.toLowerCase().replace('hrb-', '');
-        if (!String(ticket.id).toLowerCase().includes(idStr)) return false;
+        const ticketDisplayId = ticket.display_id || ticket.id;
+        const ticketIdForSearch = ticketDisplayId.toLowerCase().replace('hrb-', '');
+        if (!ticketIdForSearch.includes(idStr)) return false;
       }
 
       // Search filter (title)
@@ -167,7 +169,8 @@ export default function TicketList({ initialTickets = [], initialProjects = [], 
 
   const handleCopyToClipboard = async (ticket: Ticket, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click
-    const textToCopy = `HRB-${ticket.id} - ${ticket.title}`;
+    const ticketDisplayId = ticket.display_id || ticket.id;
+    const textToCopy = `${ticketDisplayId.startsWith('HRB-') ? ticketDisplayId : `HRB-${ticketDisplayId}`} - ${ticket.title}`;
     try {
       await navigator.clipboard.writeText(textToCopy);
       setCopiedTicketId(ticket.id);
@@ -440,7 +443,9 @@ export default function TicketList({ initialTickets = [], initialProjects = [], 
                         >
                           <td className="px-3 py-3 text-sm font-medium text-gray-900 break-words">
                             <div className="flex items-center gap-2">
-                              <span className="break-words">HRB-{ticket.id}</span>
+                              <span className="break-words">
+                                {ticket.display_id || (ticket.id.startsWith('HRB-') ? ticket.id : `HRB-${ticket.id}`)}
+                              </span>
                               <button
                                 onClick={(e) => handleCopyToClipboard(ticket, e)}
                                 className={`transition-all p-1 rounded ${

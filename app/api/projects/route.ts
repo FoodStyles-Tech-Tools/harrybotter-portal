@@ -4,12 +4,23 @@ import type { Project } from '@/types';
 
 export async function GET() {
   try {
-    const projects = await supabaseRequest('project', {
-      params: 'select=id,projectName',
+    const projects = await supabaseRequest('projects', {
+      params: 'select=id,name',
     });
     
     const result: Project[] = projects
-      .map((p: any) => ({ id: p.id, name: p.projectName }))
+      .map((p: any) => ({ 
+        id: p.id, 
+        name: p.name,
+        description: p.description,
+        owner_id: p.owner_id,
+        status: p.status,
+        created_at: p.created_at,
+        updated_at: p.updated_at,
+        department_id: p.department_id,
+        links: p.links,
+        collaborator_ids: p.collaborator_ids,
+      }))
       .filter((p: Project) => p.id && p.name);
 
     return NextResponse.json(result);

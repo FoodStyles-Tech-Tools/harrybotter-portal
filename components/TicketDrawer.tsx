@@ -32,7 +32,7 @@ export default function TicketDrawer({ ticket, isOpen, onClose }: TicketDrawerPr
           >
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900">
-                HRB-{ticket.id}: {ticket.title}
+                {ticket.display_id || (ticket.id.startsWith('HRB-') ? ticket.id : `HRB-${ticket.id}`)}: {ticket.title}
               </h2>
               <button
                 onClick={onClose}

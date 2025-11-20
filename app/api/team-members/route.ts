@@ -4,18 +4,27 @@ import type { TeamMember } from '@/types';
 
 export async function GET() {
   try {
-    const data = await supabaseRequest('user', {
-      params: 'select=id,name,email,discordId',
+    // Get all users - we'll filter by role in code to ensure reliability
+    // This avoids PostgREST query syntax issues with string values
+    const allData = await supabaseRequest('users', {
+      params: 'select=id,name,email,role,avatar_url,discord_id',
     });
     
-    const members: TeamMember[] = data
+    // Filter users by role = 'admin' OR role = 'member'
+    const members: TeamMember[] = allData
       .map((row: any) => ({
         id: row.id,
         name: row.name,
         email: row.email,
-        discordId: row.discordId,
+        avatar_url: row.avatar_url,
+        role: row.role,
+        discordId: row.discord_id, // Extract discord_id from users table
       }))
-      .filter((member: TeamMember) => member.name && member.email);
+      .filter((member: TeamMember) => 
+        member.name && 
+        member.email && 
+        (member.role === 'admin' || member.role === 'member')
+      );
 
     return NextResponse.json(members);
   } catch (error: any) {
