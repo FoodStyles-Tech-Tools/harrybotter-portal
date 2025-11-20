@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
 import TicketDrawer from './TicketDrawer';
-import type { Ticket } from '@/types';
+import type { Ticket, Project } from '@/types';
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   Open: { bg: 'bg-gray-100', text: 'text-gray-700' },
@@ -24,7 +24,7 @@ const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
 
 interface TicketListProps {
   initialTickets?: Ticket[];
-  initialProjects?: Array<{ id: number; name: string }>;
+  initialProjects?: Project[];
   initialTicketIdFilter?: string | null;
   onRefresh?: () => void;
 }
