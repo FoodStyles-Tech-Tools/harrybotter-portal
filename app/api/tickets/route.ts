@@ -223,7 +223,7 @@ export async function POST(request: Request) {
         const webAppUrl = process.env.NEXT_PUBLIC_WEB_APP_URL || 'https://techtool-app.vercel.app';
         const description = insertedTickets.map((ticket: any) => {
           const ticketDisplayId = ticket.display_id || `HRB-${ticket.id}`;
-          const ticketUrl = `${webAppUrl}/all-tickets?ticket=${ticketDisplayId}`;
+          const ticketUrl = `${webAppUrl}/tickets/${ticketDisplayId.toLowerCase()}`;
           const ticketLink = `[**[${ticketDisplayId}] - ${ticket.title}**](${ticketUrl})`;
 
           const assigneeText = payload.assigneeName
