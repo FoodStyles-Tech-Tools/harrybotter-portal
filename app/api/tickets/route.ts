@@ -42,6 +42,18 @@ export async function GET() {
       return 'Request';
     };
 
+    const formatStatus = (dbValue: string): 'Open' | 'In Progress' | 'Completed' | 'Cancelled' | 'Rejected' | 'On Hold' | 'Blocked' => {
+      const lower = dbValue?.toLowerCase() || 'open';
+      if (lower === 'open') return 'Open';
+      if (lower === 'in_progress' || lower === 'in progress') return 'In Progress';
+      if (lower === 'completed') return 'Completed';
+      if (lower === 'cancelled' || lower === 'canceled') return 'Cancelled';
+      if (lower === 'rejected') return 'Rejected';
+      if (lower === 'on_hold' || lower === 'on hold') return 'On Hold';
+      if (lower === 'blocked') return 'Blocked';
+      return 'Open';
+    };
+
     const allTickets: Ticket[] = ticketsData.map((t: any) => {
       // Extract relevant link from links jsonb field
       let relevantLink: string | undefined;
@@ -64,7 +76,7 @@ export async function GET() {
         requested_by_id: t.requested_by_id,
         priority: formatPriority(t.priority),
         type: formatType(t.type),
-        status: t.status || 'Open',
+        status: formatStatus(t.status),
         assignee: t.assignee_id ? userMap[t.assignee_id] : '',
         assignee_id: t.assignee_id,
         description: t.description || '',

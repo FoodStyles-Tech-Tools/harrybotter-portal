@@ -340,11 +340,11 @@ export default function TicketList({ initialTickets = [], initialProjects = [], 
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Statuses</option>
-              {Object.keys(STATUS_COLORS).map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Blocked">Blocked</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Completed">Completed</option>
             </select>
           </div>
           <div>

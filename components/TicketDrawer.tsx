@@ -64,6 +64,29 @@ export default function TicketDrawer({ ticket, isOpen, onClose }: TicketDrawerPr
                   <p className="text-sm text-gray-900">{ticket.completedAt}</p>
                 </div>
               )}
+              {ticket.status === 'Cancelled' && (() => {
+                // Try to get cancellation reason from meta field
+                let cancellationReason: string | null = null;
+                if (ticket.meta) {
+                  if (typeof ticket.meta === 'object') {
+                    cancellationReason = ticket.meta.cancellation_reason || ticket.meta.reason || ticket.meta.cancellationReason || null;
+                  } else if (typeof ticket.meta === 'string') {
+                    try {
+                      const metaParsed = JSON.parse(ticket.meta);
+                      cancellationReason = metaParsed.cancellation_reason || metaParsed.reason || metaParsed.cancellationReason || null;
+                    } catch {
+                      // If parsing fails, treat meta as the reason itself
+                      cancellationReason = ticket.meta;
+                    }
+                  }
+                }
+                return cancellationReason ? (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 mb-2">Cancellation Reason</h3>
+                    <p className="text-sm text-gray-900 whitespace-pre-wrap">{cancellationReason}</p>
+                  </div>
+                ) : null;
+              })()}
               {ticket.relevantLink && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2">Attachments</h3>
