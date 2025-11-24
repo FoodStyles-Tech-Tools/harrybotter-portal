@@ -124,7 +124,7 @@ function TicketPageContent() {
             <TicketList 
               initialTickets={tickets} 
               initialProjects={projects}
-              initialTicketDisplayId={displayId}
+              initialTicketIdFilter={displayId}
               onRefresh={() => {
                 // Reload tickets on refresh
                 fetch('/api/tickets')
