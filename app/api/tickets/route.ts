@@ -170,7 +170,7 @@ export async function POST(request: Request) {
 
     for (const ticket of payload.tickets) {
       // Build links jsonb field from url
-      const links = ticket.url ? [ticket.url] : null;
+      const links = ticket.url ? [ticket.url] : [];
 
       const dataToStore: any = {
         title: ticket.title,
