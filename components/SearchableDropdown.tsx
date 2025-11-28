@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -34,8 +35,10 @@ export default function SearchableDropdown({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [failedAvatars, setFailedAvatars] = useState<Record<string, boolean>>({});
 
   const selectedOption = options.find((opt) => String(opt.id || opt.name) === String(value));
+  const selectedKey = selectedOption ? String(selectedOption.id ?? selectedOption.name) : undefined;
 
   const filteredOptions = options.filter((option) => {
     const search = searchTerm.toLowerCase();
@@ -99,16 +102,14 @@ export default function SearchableDropdown({
     <div ref={containerRef} className={`relative ${className}`}>
       <div className="relative">
         <div className="relative flex items-center">
-          {selectedOption?.avatar_url && !isOpen && (
-            <img
-              src={selectedOption.avatar_url}
-              alt={selectedOption.name}
-              className="absolute left-3 w-6 h-6 rounded-full object-cover"
-              onError={(e) => {
-                // Hide image if it fails to load
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
+          {allowClear && selectedOption && !isLoading && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xl leading-none"
+            >
+              ×
+            </button>
           )}
           <input
             ref={inputRef}
@@ -125,17 +126,8 @@ export default function SearchableDropdown({
             disabled={isLoading}
             className={`w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
               isLoading ? 'bg-gray-100 animate-pulse' : 'bg-white'
-            } ${selectedOption?.avatar_url && !isOpen ? 'pl-10' : ''} ${allowClear && selectedOption ? 'pr-8' : ''}`}
+            } ${allowClear && selectedOption ? 'pr-8' : ''}`}
           />
-          {allowClear && selectedOption && !isLoading && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xl leading-none"
-            >
-              ×
-            </button>
-          )}
         </div>
       </div>
 
@@ -159,18 +151,22 @@ export default function SearchableDropdown({
                     : 'hover:bg-gray-50'
                 }`}
               >
-                {option.avatar_url && (
-                  <img
+                {option.avatar_url && !(failedAvatars[String(option.id ?? option.name)] ?? false) ? (
+                  <Image
                     src={option.avatar_url}
                     alt={option.name}
+                    width={32}
+                    height={32}
+                    unoptimized
                     className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                    onError={(e) => {
-                      // Hide image if it fails to load
-                      (e.target as HTMLImageElement).style.display = 'none';
+                    onError={(event) => {
+                      const key = String(option.id ?? option.name);
+                      setFailedAvatars((prev) => ({ ...prev, [key]: true }));
+                      const target = event.currentTarget;
+                      target.style.display = 'none';
                     }}
                   />
-                )}
-                {!option.avatar_url && (
+                ) : (
                   <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs font-medium flex-shrink-0">
                     {option.name.charAt(0).toUpperCase()}
                   </div>

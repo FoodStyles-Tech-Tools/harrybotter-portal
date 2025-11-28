@@ -3,23 +3,24 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
-import type { User, TeamMember, Project, TicketFormData } from '@/types';
+import type { TeamMember, Project, TicketFormData } from '@/types';
 
 interface TicketFormProps {
   onSubmit: (payload: any) => Promise<void>;
-  initialUsers?: User[];
+  currentUser: {
+    name: string;
+    email?: string | null;
+  };
   initialTeamMembers?: TeamMember[];
   initialProjects?: Project[];
   isLoading?: boolean;
   // Controlled form state (optional - for persistence across tab switches)
   formState?: {
-    requester: DropdownOption | null;
     project: DropdownOption | null;
     assignee: DropdownOption | null;
     tickets: TicketFormData[];
   };
   onFormStateChange?: (state: {
-    requester: DropdownOption | null;
     project: DropdownOption | null;
     assignee: DropdownOption | null;
     tickets: TicketFormData[];
@@ -27,15 +28,15 @@ interface TicketFormProps {
   onReset?: () => void;
 }
 
-export default function TicketForm({ 
-  onSubmit, 
-  initialUsers = [], 
-  initialTeamMembers = [], 
+export default function TicketForm({
+  onSubmit,
+  currentUser,
+  initialTeamMembers = [],
   initialProjects = [],
   isLoading = false,
   formState,
   onFormStateChange,
-  onReset
+  onReset,
 }: TicketFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rephrasingIndex, setRephrasingIndex] = useState<number | null>(null);
@@ -47,17 +48,16 @@ export default function TicketForm({
   const [isRephrasing, setIsRephrasing] = useState(false);
 
   // Use controlled state if provided, otherwise use local state
-  const [localRequester, setLocalRequester] = useState<DropdownOption | null>(null);
   const [localProject, setLocalProject] = useState<DropdownOption | null>(null);
   const [localAssignee, setLocalAssignee] = useState<DropdownOption | null>(null);
   const [localTickets, setLocalTickets] = useState<TicketFormData[]>([
     { title: '', description: '', url: '', type: 'Request' as const, priority: 'Medium' as const, attachments: [] },
   ]);
 
-  const requester = formState?.requester ?? localRequester;
   const project = formState?.project ?? localProject;
   const assignee = formState?.assignee ?? localAssignee;
   const tickets = formState?.tickets ?? localTickets;
+  const requester = currentUser;
 
   // Warn when page refresh/close during rephrase
   useEffect(() => {
@@ -86,20 +86,17 @@ export default function TicketForm({
   }, [isRephrasing]);
 
   const updateState = (updates: Partial<{
-    requester: DropdownOption | null;
     project: DropdownOption | null;
     assignee: DropdownOption | null;
     tickets: TicketFormData[];
   }>) => {
     if (onFormStateChange) {
       onFormStateChange({
-        requester: updates.requester ?? requester,
         project: updates.project ?? project,
         assignee: updates.assignee ?? assignee,
         tickets: updates.tickets ?? tickets,
       });
     } else {
-      if (updates.requester !== undefined) setLocalRequester(updates.requester);
       if (updates.project !== undefined) setLocalProject(updates.project);
       if (updates.assignee !== undefined) setLocalAssignee(updates.assignee);
       if (updates.tickets !== undefined) setLocalTickets(updates.tickets);
@@ -202,8 +199,8 @@ export default function TicketForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!requester) {
-      alert('Please select a requester.');
+    if (!requester?.name) {
+      alert('Your account is missing a display name. Please contact TechTool.');
       return;
     }
 
@@ -213,8 +210,7 @@ export default function TicketForm({
       return;
     }
 
-    const user = initialUsers.find((u) => u.name === requester.name);
-    const requesterEmail = user?.email || '';
+    const requesterEmail = requester.email || '';
 
     setIsSubmitting(true);
     try {
@@ -237,7 +233,6 @@ export default function TicketForm({
         attachments: [],
       };
       const resetState = {
-        requester: null,
         project: null,
         assignee: null,
         tickets: [resetTicket],
@@ -254,7 +249,6 @@ export default function TicketForm({
     }
   };
 
-  const userOptions: DropdownOption[] = initialUsers.map((u) => ({ id: u.name, name: u.name, email: u.email }));
   const projectOptions: DropdownOption[] = initialProjects.map((p) => ({ id: p.id, name: p.name }));
   const assigneeOptions: DropdownOption[] = initialTeamMembers.map((m) => ({
     id: m.id,
@@ -265,19 +259,7 @@ export default function TicketForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Requester *
-          </label>
-          <SearchableDropdown
-            options={userOptions}
-            placeholder="Select requester..."
-            value={requester?.id}
-            onSelect={(value) => updateState({ requester: value })}
-            isLoading={isLoading}
-          />
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Project (Optional)

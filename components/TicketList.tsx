@@ -26,10 +26,17 @@ interface TicketListProps {
   initialTickets?: Ticket[];
   initialProjects?: Project[];
   initialTicketIdFilter?: string | null;
+  initialRequesterName?: string | null;
   onRefresh?: () => void;
 }
 
-export default function TicketList({ initialTickets = [], initialProjects = [], initialTicketIdFilter, onRefresh }: TicketListProps) {
+export default function TicketList({
+  initialTickets = [],
+  initialProjects = [],
+  initialTicketIdFilter,
+  initialRequesterName,
+  onRefresh,
+}: TicketListProps) {
   const [tickets, setTickets] = useState<Ticket[]>(initialTickets);
   const [isLoading, setIsLoading] = useState(!initialTickets.length);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
@@ -39,7 +46,9 @@ export default function TicketList({ initialTickets = [], initialProjects = [], 
   // Filters
   const [ticketIdFilter, setTicketIdFilter] = useState(initialTicketIdFilter || '');
   const [searchFilter, setSearchFilter] = useState('');
-  const [requesterFilter, setRequesterFilter] = useState<DropdownOption | null>(null);
+  const [requesterFilter, setRequesterFilter] = useState<DropdownOption | null>(
+    initialRequesterName ? { id: initialRequesterName, name: initialRequesterName } : null
+  );
   const [projectFilter, setProjectFilter] = useState<DropdownOption | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [typeFilter, setTypeFilter] = useState<string>('');
@@ -78,6 +87,12 @@ export default function TicketList({ initialTickets = [], initialProjects = [], 
       setTicketIdFilter(initialTicketIdFilter);
     }
   }, [initialTicketIdFilter]);
+
+  useEffect(() => {
+    if (initialRequesterName) {
+      setRequesterFilter({ id: initialRequesterName, name: initialRequesterName });
+    }
+  }, [initialRequesterName]);
 
   const requesters = useMemo(() => {
     const unique = Array.from(new Set(tickets.map((t) => t.requestedBy).filter(Boolean)));
