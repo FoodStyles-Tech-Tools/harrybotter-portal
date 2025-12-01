@@ -12,6 +12,23 @@ interface TicketDrawerProps {
 export default function TicketDrawer({ ticket, isOpen, onClose }: TicketDrawerProps) {
   if (!ticket) return null;
 
+  const dueDate = ticket.dueDate || ticket.due_date || null;
+  const formatDateTime = (value?: string | null) => {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -50,18 +67,24 @@ export default function TicketDrawer({ ticket, isOpen, onClose }: TicketDrawerPr
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500 mb-2">Created At</h3>
-                <p className="text-sm text-gray-900">{ticket.createdAt || '-'}</p>
+                <p className="text-sm text-gray-900">{formatDateTime(ticket.createdAt)}</p>
               </div>
+              {dueDate && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Expected Done Date</h3>
+                  <p className="text-sm text-gray-900">{formatDateTime(dueDate)}</p>
+                </div>
+              )}
               {ticket.assignedAt && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2">Assigned At</h3>
-                  <p className="text-sm text-gray-900">{ticket.assignedAt}</p>
+                  <p className="text-sm text-gray-900">{formatDateTime(ticket.assignedAt)}</p>
                 </div>
               )}
               {ticket.completedAt && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2">Completed At</h3>
-                  <p className="text-sm text-gray-900">{ticket.completedAt}</p>
+                  <p className="text-sm text-gray-900">{formatDateTime(ticket.completedAt)}</p>
                 </div>
               )}
               {ticket.status === 'Cancelled' && (() => {

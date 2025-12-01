@@ -5,7 +5,7 @@ import type { Project } from '@/types';
 export async function GET() {
   try {
     const projects = await supabaseRequest('projects', {
-      params: 'select=id,name',
+      params: 'select=id,name,description,owner_id,status,created_at,updated_at,department_id,links,collaborator_ids',
     });
     
     const result: Project[] = projects

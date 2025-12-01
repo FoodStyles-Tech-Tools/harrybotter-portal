@@ -92,6 +92,8 @@ export async function GET() {
         links: t.links,
         meta: t.meta,
         department_id: t.department_id,
+        dueDate: t.due_date || null,
+        due_date: t.due_date || null,
       };
     });
 
@@ -171,6 +173,7 @@ export async function POST(request: Request) {
     for (const ticket of payload.tickets) {
       // Build links jsonb field from url
       const links = ticket.url ? [ticket.url] : [];
+      const dueDate = ticket.expectedDoneDate?.trim() ? ticket.expectedDoneDate : null;
 
       const dataToStore: any = {
         title: ticket.title,
@@ -185,6 +188,7 @@ export async function POST(request: Request) {
         assigned_at: payload.assignee ? nowISO : null,
         display_id: `HRB-${nextDisplayId}`,
         links: links,
+        due_date: dueDate,
       };
       ticketsToInsert.push(dataToStore);
       nextDisplayId++;
@@ -296,4 +300,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

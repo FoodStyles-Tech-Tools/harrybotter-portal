@@ -56,6 +56,8 @@ export interface Ticket {
   links?: any;
   meta?: any;
   department_id?: string;
+  dueDate?: string | null;
+  due_date?: string | null;
 }
 
 export interface TicketFormData {
@@ -65,6 +67,7 @@ export interface TicketFormData {
   type: 'Request' | 'Bug' | 'Task';
   priority: 'Urgent' | 'High' | 'Medium' | 'Low';
   attachments: Attachment[];
+  expectedDoneDate?: string | null;
 }
 
 export interface Attachment {

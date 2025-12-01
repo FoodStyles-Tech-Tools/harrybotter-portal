@@ -1,9 +1,71 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
 import type { TeamMember, Project, TicketFormData } from '@/types';
+
+const TYPE_OPTIONS = [
+  {
+    value: 'Request' as const,
+    label: 'Request',
+    icon: () => (
+      <svg className="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h10M7 12h6m6-6v10.5a2.5 2.5 0 01-2.5 2.5H7.5A2.5 2.5 0 015 16.5V5a2 2 0 012-2h8l4 4z" />
+      </svg>
+    ),
+  },
+  {
+    value: 'Bug' as const,
+    label: 'Bug',
+    icon: () => (
+      <svg className="w-4 h-4 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11 11V6a2 2 0 014 0v5m1 8h-6a3 3 0 01-3-3v-4a6 6 0 0112 0v4a3 3 0 01-3 3z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 9l2 2m12-2l-2 2M4 15h3m13 0h-3M6 19l2-2m10 2l-2-2" />
+      </svg>
+    ),
+  },
+];
+
+const PRIORITY_OPTIONS = [
+  {
+    value: 'Low' as const,
+    label: 'Low',
+    icon: () => (
+      <div className="w-4 h-4 flex items-center justify-center text-blue-600">
+        <div className="w-2 h-2 border-b-2 border-r-2 border-current transform rotate-45 translate-y-1" />
+      </div>
+    ),
+  },
+  {
+    value: 'Medium' as const,
+    label: 'Medium',
+    icon: () => (
+      <div className="w-4 h-4 flex items-center justify-center">
+        <div className="w-3 h-0.5 bg-yellow-500 rounded-sm" />
+      </div>
+    ),
+  },
+  {
+    value: 'High' as const,
+    label: 'High',
+    icon: () => (
+      <div className="w-4 h-4 flex items-center justify-center text-red-600">
+        <div className="w-2 h-2 border-t-2 border-r-2 border-current transform rotate-45 -translate-y-1" />
+      </div>
+    ),
+  },
+  {
+    value: 'Urgent' as const,
+    label: 'Urgent',
+    icon: () => (
+      <div className="w-4 h-4 flex flex-col items-center justify-center text-red-600">
+        <div className="w-2 h-2 border-t-2 border-r-2 border-current transform rotate-45 -translate-y-1" />
+        <div className="w-2 h-2 border-t-2 border-r-2 border-current transform rotate-45 -translate-y-0.5" />
+      </div>
+    ),
+  },
+];
 
 interface TicketFormProps {
   onSubmit: (payload: any) => Promise<void>;
@@ -51,7 +113,15 @@ export default function TicketForm({
   const [localProject, setLocalProject] = useState<DropdownOption | null>(null);
   const [localAssignee, setLocalAssignee] = useState<DropdownOption | null>(null);
   const [localTickets, setLocalTickets] = useState<TicketFormData[]>([
-    { title: '', description: '', url: '', type: 'Request' as const, priority: 'Medium' as const, attachments: [] },
+    {
+      title: '',
+      description: '',
+      url: '',
+      type: 'Request' as const,
+      priority: 'Medium' as const,
+      attachments: [],
+      expectedDoneDate: null,
+    },
   ]);
 
   const project = formState?.project ?? localProject;
@@ -112,6 +182,7 @@ export default function TicketForm({
       type: 'Request',
       priority: 'Medium',
       attachments: [],
+      expectedDoneDate: null,
     };
     const newTickets = [...tickets, newTicket];
     updateState({ tickets: newTickets });
@@ -231,6 +302,7 @@ export default function TicketForm({
         type: 'Request',
         priority: 'Medium',
         attachments: [],
+        expectedDoneDate: null,
       };
       const resetState = {
         project: null,
@@ -249,13 +321,66 @@ export default function TicketForm({
     }
   };
 
-  const projectOptions: DropdownOption[] = initialProjects.map((p) => ({ id: p.id, name: p.name }));
-  const assigneeOptions: DropdownOption[] = initialTeamMembers.map((m) => ({
-    id: m.id,
-    name: m.name,
-    email: m.email,
-    avatar_url: m.avatar_url,
-  }));
+  const projectOptions: DropdownOption[] = useMemo(
+    () => initialProjects.map((p) => ({ id: p.id, name: p.name })),
+    [initialProjects]
+  );
+  const assigneeOptions: DropdownOption[] = useMemo(
+    () =>
+      initialTeamMembers.map((m) => ({
+        id: m.id,
+        name: m.name,
+        email: m.email,
+        avatar_url: m.avatar_url,
+      })),
+    [initialTeamMembers]
+  );
+
+  const handleProjectSelect = (selectedProject: DropdownOption | null) => {
+    let nextAssignee: DropdownOption | null = assignee ?? null;
+
+    if (selectedProject?.id) {
+      const projectDetails = initialProjects.find(
+        (projectItem) => String(projectItem.id) === String(selectedProject.id)
+      );
+      const ownerId = projectDetails?.owner_id;
+      if (ownerId) {
+        nextAssignee =
+          assigneeOptions.find(
+            (assigneeOption) => String(assigneeOption.id) === String(ownerId)
+          ) ?? null;
+      } else {
+        nextAssignee = null;
+      }
+    } else {
+      nextAssignee = null;
+    }
+
+    updateState({
+      project: selectedProject,
+      assignee: nextAssignee,
+    });
+  };
+
+  useEffect(() => {
+    const currentProjectId = project?.id ? String(project.id) : null;
+    if (!currentProjectId) return;
+    if (assignee) return;
+
+    const projectDetails = initialProjects.find(
+      (projectItem) => String(projectItem.id) === currentProjectId
+    );
+    const ownerId = projectDetails?.owner_id;
+    if (!ownerId) return;
+
+    const ownerAssignee =
+      assigneeOptions.find((assigneeOption) => String(assigneeOption.id) === String(ownerId)) ??
+      null;
+
+    if (ownerAssignee) {
+      updateState({ assignee: ownerAssignee });
+    }
+  }, [project?.id, initialProjects, assigneeOptions, assignee, updateState]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -268,7 +393,7 @@ export default function TicketForm({
             options={projectOptions}
             placeholder="Select project..."
             value={project?.id}
-            onSelect={(value) => updateState({ project: value })}
+            onSelect={handleProjectSelect}
             allowClear
             isLoading={isLoading}
           />
@@ -309,6 +434,9 @@ export default function TicketForm({
               <tr className="bg-gray-100">
                 <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">
                   Details *
+                </th>
+                <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold text-gray-700" style={{ width: '14%' }}>
+                  Expected Done Date
                 </th>
                 <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold text-gray-700" style={{ width: '12%' }}>
                   Type
@@ -455,6 +583,14 @@ export default function TicketForm({
                       )}
                     </div>
                   </td>
+                  <td className="border border-gray-300 px-2 py-2" style={{ width: '14%' }}>
+                    <input
+                      type="date"
+                      value={ticket.expectedDoneDate ?? ''}
+                      onChange={(e) => updateTicket(index, 'expectedDoneDate', e.target.value || null)}
+                      className="w-full px-1 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </td>
                   <td className="border border-gray-300 px-2 py-2" style={{ width: '12%' }}>
                     <select
                       value={ticket.type}
@@ -463,7 +599,6 @@ export default function TicketForm({
                     >
                       <option value="Request">Request</option>
                       <option value="Bug">Bug</option>
-                      <option value="Task">Task</option>
                     </select>
                   </td>
                   <td className="border border-gray-300 px-2 py-2" style={{ width: '12%' }}>
