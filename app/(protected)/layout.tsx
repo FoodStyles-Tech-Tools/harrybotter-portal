@@ -7,7 +7,7 @@ import { isUserAllowed } from '@/lib/allowed-user';
 import { getBetterAuthSession, hasBetterAuthSessionCookie } from '@/lib/server-session';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // Revalidate every 60 seconds
 
 export default async function ProtectedLayout({ children }: { children: ReactNode }) {
   if (!hasBetterAuthSessionCookie()) {

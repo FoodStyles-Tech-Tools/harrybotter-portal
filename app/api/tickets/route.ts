@@ -20,8 +20,9 @@ export async function GET() {
       return map;
     }, {});
 
+    // Only fetch necessary fields instead of select=* to reduce bandwidth
     const ticketsData = await supabaseRequest('tickets', {
-      params: 'select=*&order=created_at.desc',
+      params: 'select=id,display_id,title,description,project_id,requested_by_id,assignee_id,priority,type,status,created_at,assigned_at,started_at,completed_at,updated_at,links,meta,department_id,due_date&order=created_at.desc',
     });
 
     // Helper function to convert database enum values to display format
@@ -97,7 +98,12 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json(allTickets);
+    // Add cache headers: 60s cache with stale-while-revalidate for 5 minutes
+    return NextResponse.json(allTickets, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    });
   } catch (error: any) {
     console.error('Error in getAllTickets:', error);
     return NextResponse.json(

@@ -20,7 +20,12 @@ export async function GET() {
       }))
       .filter((user: User) => user.name);
 
-    return NextResponse.json(users);
+    // Add cache headers: 10 minutes cache for users (data changes infrequently)
+    return NextResponse.json(users, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=600',
+      },
+    });
   } catch (error: any) {
     console.error('Error in getUsers:', error);
     return NextResponse.json([], { status: 500 });

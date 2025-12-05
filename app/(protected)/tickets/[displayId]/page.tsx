@@ -5,8 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import TicketList from '@/components/TicketList';
 import type { Project, Ticket } from '@/types';
 
-export const dynamic = 'force-dynamic';
-
 function TicketPageContent() {
   const params = useParams();
   const router = useRouter();

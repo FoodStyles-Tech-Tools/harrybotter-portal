@@ -26,7 +26,12 @@ export async function GET() {
         (member.role === 'admin' || member.role === 'member')
       );
 
-    return NextResponse.json(members);
+    // Add cache headers: 10 minutes cache for team members (data changes infrequently)
+    return NextResponse.json(members, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=600',
+      },
+    });
   } catch (error: any) {
     console.error('Error in getTeamMembers:', error);
     return NextResponse.json([], { status: 500 });

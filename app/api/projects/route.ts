@@ -23,7 +23,12 @@ export async function GET() {
       }))
       .filter((p: Project) => p.id && p.name);
 
-    return NextResponse.json(result);
+    // Add cache headers: 10 minutes cache for projects (data changes infrequently)
+    return NextResponse.json(result, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=600',
+      },
+    });
   } catch (error: any) {
     console.error('Error in getProjects:', error);
     return NextResponse.json([], { status: 500 });

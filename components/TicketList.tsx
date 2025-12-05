@@ -391,15 +391,15 @@ export default function TicketList({
           <div className="overflow-x-auto">
             <table className="w-full">
               <colgroup>
-                <col style={{ width: '8%' }} /> {/* ID */}
-                <col style={{ width: '25%' }} /> {/* Title */}
-                <col style={{ width: '10%' }} /> {/* Project */}
-                <col style={{ width: '10%' }} /> {/* Requester */}
-                <col style={{ width: '10%' }} /> {/* Assignee */}
-                <col style={{ width: '8%' }} /> {/* Type */}
-                <col style={{ width: '8%' }} /> {/* Priority */}
-                <col style={{ width: '10%' }} /> {/* Status */}
-                <col style={{ width: '11%' }} /> {/* Created At */}
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '25%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '11%' }} />
               </colgroup>
               <thead className="bg-gray-50">
                 <tr>
@@ -433,7 +433,7 @@ export default function TicketList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                <AnimatePresence mode="wait">
+                <AnimatePresence>
                   {paginatedTickets.length === 0 ? (
                     <tr>
                       <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
