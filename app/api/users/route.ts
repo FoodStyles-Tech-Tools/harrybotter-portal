@@ -20,10 +20,10 @@ export async function GET() {
       }))
       .filter((user: User) => user.name);
 
-    // Add cache headers: 10 minutes cache for users (data changes infrequently)
+    // OPTIMIZED: Increased cache from 10 minutes to 1 hour (users rarely change)
     return NextResponse.json(users, {
       headers: {
-        'Cache-Control': 'public, s-maxage=600',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
       },
     });
   } catch (error: any) {

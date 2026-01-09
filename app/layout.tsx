@@ -1,25 +1,19 @@
-import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata } from 'next';
 import './globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
+import { SWRProvider } from '@/lib/swr-config';
 
 export const metadata: Metadata = {
-  title: 'Harry Botter Portal',
-  description: 'TechTool Ticketing System',
-  manifest: '/manifest.json',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'Harry Botter Portal',
+  title: 'HarryBotter Portal - Tech Tools',
+  description: 'Internal ticket management system for FoodStyles Tech Team',
+  icons: {
+    icon: '/favicon.ico',
   },
 };
 
-export const viewport: Viewport = {
+export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#007aff',
 };
 
 export default function RootLayout({
@@ -29,12 +23,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
-      </head>
-      <body className={inter.className}>{children}</body>
+      <body>
+        <SWRProvider>{children}</SWRProvider>
+      </body>
     </html>
   );
 }
-

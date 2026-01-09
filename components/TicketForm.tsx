@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
 import type { TeamMember, Project, TicketFormData } from '@/types';
 
@@ -451,10 +450,8 @@ export default function TicketForm({
             </thead>
             <tbody>
               {tickets.map((ticket, index) => (
-                <motion.tr
+                <tr
                   key={index}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
                   className="hover:bg-gray-50"
                 >
                   <td className="border border-gray-300 px-3 py-2">
@@ -532,9 +529,7 @@ export default function TicketForm({
                         />
                       </div>
                       {rephraseResult && rephrasingIndex === index && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
+                        <div
                           className="p-3 bg-blue-50 border border-blue-200 rounded-lg"
                         >
                           <div className="space-y-2">
@@ -579,7 +574,7 @@ export default function TicketForm({
                               </button>
                             </div>
                           </div>
-                        </motion.div>
+                        </div>
                       )}
                     </div>
                   </td>
@@ -625,7 +620,7 @@ export default function TicketForm({
                       </svg>
                     </button>
                   </td>
-                </motion.tr>
+                </tr>
               ))}
             </tbody>
           </table>

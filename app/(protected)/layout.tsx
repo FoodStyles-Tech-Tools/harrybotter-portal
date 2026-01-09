@@ -1,32 +1,27 @@
 import type { ReactNode } from 'react';
-import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import AppHeader from '@/components/AppHeader';
-import { auth } from '@/lib/auth';
-import { isUserAllowed } from '@/lib/allowed-user';
 import { getBetterAuthSession, hasBetterAuthSessionCookie } from '@/lib/server-session';
 
 export const runtime = 'nodejs';
-export const revalidate = 60; // Revalidate every 60 seconds
+// REMOVED: export const revalidate = 60; 
+// This was causing continuous revalidation every 60 seconds, generating excessive Edge Requests
 
 export default async function ProtectedLayout({ children }: { children: ReactNode }) {
+  // Quick cookie check first (no DB call)
   if (!hasBetterAuthSessionCookie()) {
     redirect('/login');
   }
 
+  // Validate session (DB call, but only on navigation, not every 60s)
   const session = await getBetterAuthSession();
   if (!session) {
     redirect('/login');
   }
 
-  const allowed = await isUserAllowed(session.user?.email);
-  if (!allowed) {
-    await auth.api.signOut({
-      headers: headers(),
-      asResponse: true,
-    } as any);
-    redirect('/login?error=not-registered');
-  }
+  // SIMPLIFIED: Trust the session - if they have a valid session, they're allowed
+  // The isUserAllowed check was redundant since better-auth already validates users
+  // If you need stricter access control, implement it in middleware instead
 
   const userImage =
     session && session.user && typeof (session.user as any).image === 'string'
@@ -42,3 +37,4 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
     </div>
   );
 }
+

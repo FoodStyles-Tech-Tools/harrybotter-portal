@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import useSWR from 'swr';
 import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
 import TicketDrawer from './TicketDrawer';
 import type { Ticket, Project } from '@/types';
@@ -30,6 +30,8 @@ interface TicketListProps {
   onRefresh?: () => void;
 }
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function TicketList({
   initialTickets = [],
   initialProjects = [],
@@ -37,8 +39,17 @@ export default function TicketList({
   initialRequesterName,
   onRefresh,
 }: TicketListProps) {
-  const [tickets, setTickets] = useState<Ticket[]>(initialTickets);
-  const [isLoading, setIsLoading] = useState(!initialTickets.length);
+  // Use SWR for automatic caching and request deduplication
+  const { data: tickets = initialTickets, isLoading, mutate } = useSWR<Ticket[]>(
+    '/api/tickets',
+    fetcher,
+    {
+      fallbackData: initialTickets,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [copiedTicketId, setCopiedTicketId] = useState<string | null>(null);
@@ -57,29 +68,6 @@ export default function TicketList({
   const [currentPage, setCurrentPage] = useState(1);
   const [ticketsPerPage, setTicketsPerPage] = useState(10);
   const [pageInput, setPageInput] = useState('1');
-
-  useEffect(() => {
-    if (!initialTickets.length) {
-      const loadTickets = async () => {
-        try {
-          const response = await fetch('/api/tickets');
-          const data = await response.json();
-          if (data.error) {
-            console.error(data.error);
-          } else {
-            setTickets(data);
-          }
-        } catch (error) {
-          console.error('Failed to load tickets:', error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      loadTickets();
-    } else {
-      setIsLoading(false);
-    }
-  }, [initialTickets]);
 
   // Update ticket ID filter when initialTicketIdFilter changes
   useEffect(() => {
@@ -433,7 +421,6 @@ export default function TicketList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                <AnimatePresence>
                   {paginatedTickets.length === 0 ? (
                     <tr>
                       <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
@@ -447,12 +434,8 @@ export default function TicketList({
                         : [];
 
                       return (
-                        <motion.tr
+                        <tr
                           key={ticket.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
                           onClick={() => handleTicketClick(ticket)}
                           className="cursor-pointer hover:bg-gray-50 transition-colors"
                         >
@@ -573,12 +556,11 @@ export default function TicketList({
                               );
                             })()}
                           </td>
-                        </motion.tr>
+                        </tr>
                       );
                     })
                   )}
-                </AnimatePresence>
-              </tbody>
+                </tbody>
             </table>
           </div>
         </div>

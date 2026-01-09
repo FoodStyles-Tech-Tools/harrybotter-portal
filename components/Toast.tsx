@@ -1,6 +1,5 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 
 export interface Toast {
@@ -63,11 +62,8 @@ function ToastItem({ toast, onClose }: ToastProps) {
   }[toast.type];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-      className={`${bgColor} border rounded-lg shadow-lg p-4 flex items-start gap-3 min-w-[300px] max-w-md`}
+    <div
+      className={`${bgColor} border rounded-xl shadow-lg p-4 flex items-start gap-3 min-w-[300px] max-w-md`}
     >
       <div className={`${iconColor} flex-shrink-0 mt-0.5`}>{icon}</div>
       <div className={`flex-1 ${textColor} text-sm font-medium`}>{toast.message}</div>
@@ -79,7 +75,7 @@ function ToastItem({ toast, onClose }: ToastProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
-    </motion.div>
+    </div>
   );
 }
 
@@ -91,14 +87,13 @@ interface ToastContainerProps {
 export default function ToastContainer({ toasts, onClose }: ToastContainerProps) {
   return (
     <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
-      <AnimatePresence>
-        {toasts.map((toast) => (
-          <div key={toast.id} className="pointer-events-auto">
-            <ToastItem toast={toast} onClose={onClose} />
-          </div>
-        ))}
-      </AnimatePresence>
+      {toasts.map((toast) => (
+        <div key={toast.id} className="pointer-events-auto">
+          <ToastItem toast={toast} onClose={onClose} />
+        </div>
+      ))}
     </div>
   );
 }
+
 

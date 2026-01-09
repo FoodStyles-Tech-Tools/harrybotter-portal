@@ -26,10 +26,10 @@ export async function GET() {
         (member.role === 'admin' || member.role === 'member')
       );
 
-    // Add cache headers: 10 minutes cache for team members (data changes infrequently)
+    // OPTIMIZED: Increased cache from 10 minutes to 1 hour (team members rarely change)
     return NextResponse.json(members, {
       headers: {
-        'Cache-Control': 'public, s-maxage=600',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
       },
     });
   } catch (error: any) {

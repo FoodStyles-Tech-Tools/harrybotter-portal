@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import useSWR from 'swr';
 import TicketForm from '@/components/TicketForm';
 import ToastContainer from '@/components/Toast';
 import { authClient } from '@/lib/auth-client';
 import { useToast } from '@/hooks/useToast';
 import type { Project, TeamMember } from '@/types';
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function SubmitTicketPage() {
   const router = useRouter();
@@ -20,29 +22,27 @@ export default function SubmitTicketPage() {
     };
   }, [sessionState?.data?.user]);
   const { toasts, success, error, removeToast } = useToast();
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const loadFormData = async () => {
-      try {
-        const [membersRes, projectsRes] = await Promise.all([fetch('/api/team-members'), fetch('/api/projects')]);
+  // Use SWR for automatic caching and request deduplication
+  const { data: teamMembers = [], isLoading: loadingMembers } = useSWR<TeamMember[]>(
+    '/api/team-members',
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
 
-        const [membersData, projectsData] = await Promise.all([membersRes.json(), projectsRes.json()]);
+  const { data: projects = [], isLoading: loadingProjects } = useSWR<Project[]>(
+    '/api/projects',
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
 
-        setTeamMembers(membersData);
-        setProjects(projectsData);
-      } catch (err) {
-        console.error('Failed to load form data:', err);
-        error('Failed to load form data. Please refresh and try again.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadFormData();
-  }, [error]);
+  const isLoading = loadingMembers || loadingProjects;
 
   const handleTicketSubmit = async (payload: any) => {
     try {
@@ -73,7 +73,7 @@ export default function SubmitTicketPage() {
 
   return (
     <>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Submit New Tickets</h2>
           <p className="text-sm text-gray-600">
@@ -87,7 +87,7 @@ export default function SubmitTicketPage() {
           initialProjects={projects}
           isLoading={isLoading}
         />
-      </motion.div>
+      </div>
       <ToastContainer toasts={toasts} onClose={removeToast} />
     </>
   );

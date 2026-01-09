@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export interface DropdownOption {
   id?: number | string;
@@ -131,57 +130,51 @@ export default function SearchableDropdown({
         </div>
       </div>
 
-      <AnimatePresence>
-        {isOpen && filteredOptions.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
-          >
-            {filteredOptions.map((option, index) => (
-              <div
-                key={option.id || option.name}
-                onClick={() => handleSelect(option)}
-                onMouseEnter={() => setHighlightedIndex(index)}
-                className={`px-3 py-2 cursor-pointer transition-colors flex items-center gap-3 ${
-                  highlightedIndex === index
-                    ? 'bg-blue-50'
-                    : 'hover:bg-gray-50'
-                }`}
-              >
-                {option.avatar_url && !(failedAvatars[String(option.id ?? option.name)] ?? false) ? (
-                  <Image
-                    src={option.avatar_url}
-                    alt={option.name}
-                    width={32}
-                    height={32}
-                    unoptimized
-                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                    onError={(event) => {
-                      const key = String(option.id ?? option.name);
-                      setFailedAvatars((prev) => ({ ...prev, [key]: true }));
-                      const target = event.currentTarget;
-                      target.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs font-medium flex-shrink-0">
-                    {option.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm text-gray-900 truncate">{option.name}</div>
-                  {option.email && (
-                    <div className="text-xs text-gray-500 mt-0.5 truncate">{option.email}</div>
-                  )}
+      {isOpen && filteredOptions.length > 0 && (
+        <div
+          className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
+        >
+          {filteredOptions.map((option, index) => (
+            <div
+              key={option.id || option.name}
+              onClick={() => handleSelect(option)}
+              onMouseEnter={() => setHighlightedIndex(index)}
+              className={`px-3 py-2 cursor-pointer transition-colors flex items-center gap-3 ${
+                highlightedIndex === index
+                  ? 'bg-blue-50'
+                  : 'hover:bg-gray-50'
+              }`}
+            >
+              {option.avatar_url && !(failedAvatars[String(option.id ?? option.name)] ?? false) ? (
+                <Image
+                  src={option.avatar_url}
+                  alt={option.name}
+                  width={32}
+                  height={32}
+                  unoptimized
+                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                  onError={(event) => {
+                    const key = String(option.id ?? option.name);
+                    setFailedAvatars((prev) => ({ ...prev, [key]: true }));
+                    const target = event.currentTarget;
+                    target.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs font-medium flex-shrink-0">
+                  {option.name.charAt(0).toUpperCase()}
                 </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm text-gray-900 truncate">{option.name}</div>
+                {option.email && (
+                  <div className="text-xs text-gray-500 mt-0.5 truncate">{option.email}</div>
+                )}
               </div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

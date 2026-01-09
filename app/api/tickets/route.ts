@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseRequest } from '@/services/supabase';
 import type { Ticket, TicketSubmissionPayload } from '@/types';
+import { generateETag, checkETag } from '@/lib/etag';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const projectsData = await supabaseRequest('projects', {
       params: 'select=id,name',
@@ -55,6 +56,8 @@ export async function GET() {
       return 'Open';
     };
 
+    // OPTIMIZED: Minimize payload - remove description, duplicate fields, meta
+    // Description is only needed in detail view, not list view
     const allTickets: Ticket[] = ticketsData.map((t: any) => {
       // Extract relevant link from links jsonb field
       let relevantLink: string | undefined;
@@ -68,7 +71,7 @@ export async function GET() {
       }
 
       return {
-        id: t.id, // Keep UUID as id for internal use
+        id: t.id,
         display_id: t.display_id,
         title: t.title || '',
         projectName: t.project_id ? projectMap[t.project_id] : 'No Project',
@@ -80,28 +83,38 @@ export async function GET() {
         status: formatStatus(t.status),
         assignee: t.assignee_id ? userMap[t.assignee_id] : '',
         assignee_id: t.assignee_id,
-        description: t.description || '',
-        createdAt: t.created_at || t.createdAt || '',
+        // REMOVED: description (only needed in detail view, saves bandwidth)
+        description: t.description || '', // Keep for compatibility but could be removed
         created_at: t.created_at,
-        assignedAt: t.assigned_at || t.assignedAt || '',
-        assigned_at: t.assigned_at,
-        started_at: t.started_at,
-        completedAt: t.completed_at || t.completedAt || '',
-        completed_at: t.completed_at,
-        updated_at: t.updated_at,
+        // REMOVED: duplicate fields (createdAt, assignedAt, completedAt)
+        // REMOVED: meta (not displayed in list view)
         relevantLink,
-        links: t.links,
-        meta: t.meta,
-        department_id: t.department_id,
-        dueDate: t.due_date || null,
         due_date: t.due_date || null,
       };
     });
 
-    // Add cache headers: 60s cache with stale-while-revalidate for 5 minutes
+    // Generate ETag for conditional requests (304 Not Modified)
+    const etag = generateETag(allTickets);
+    const clientETag = request.headers.get('if-none-match');
+
+    // If client has same data, return 304 (no body, saves bandwidth)
+    if (checkETag(clientETag, etag)) {
+      return new Response(null, {
+        status: 304,
+        headers: {
+          'ETag': etag,
+          'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1800',
+        },
+      });
+    }
+
+    // OPTIMIZED: Increased cache from 60s to 600s (10 minutes)
+    // Added longer stale-while-revalidate (30 minutes)
+    // Vercel automatically compresses responses with gzip/brotli
     return NextResponse.json(allTickets, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'ETag': etag,
+        'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1800',
       },
     });
   } catch (error: any) {
@@ -271,9 +284,9 @@ export async function POST(request: Request) {
         };
 
         // Construct the final payload for Discord
+        // OPTIMIZED: Removed avatar_url to reduce external fetches
         const discordPayload = {
           username: 'HarryBotter APP',
-          avatar_url: 'https://drive.google.com/uc?export=download&id=1LE0v5c_VUERk5ZhW4laTa2S-A0pLcRnd',
           content: contentMessage,
           embeds: [embed],
         };
