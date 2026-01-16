@@ -1,7 +1,12 @@
 import { cookies, headers } from 'next/headers';
 import { auth } from './auth';
 
-const SESSION_COOKIE_NAMES = ['better-auth.session_token', '__Secure-better-auth.session_token'];
+const SESSION_COOKIE_NAMES = [
+  'better-auth.session_token',
+  '__Secure-better-auth.session_token',
+  'harrybotter-portal.session_token',
+  '__Secure-harrybotter-portal.session_token',
+];
 
 export function hasBetterAuthSessionCookie() {
   const cookieStore = cookies();
