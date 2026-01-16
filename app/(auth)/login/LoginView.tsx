@@ -22,7 +22,7 @@ export default function LoginView({ initialError }: LoginViewProps) {
     try {
       const { data, error: signInError } = await authClient.signIn.social({
         provider: 'google',
-        callbackURL: '/submit-ticket',
+        callbackURL: '/popup-callback',
         disableRedirect: true,
       });
 
@@ -48,11 +48,23 @@ export default function LoginView({ initialError }: LoginViewProps) {
         throw new Error('Popup was blocked. Please allow popups and try again.');
       }
 
+      const messageHandler = (event: MessageEvent) => {
+        if (event.data === 'login-success') {
+          window.location.assign('/submit-ticket');
+          if (!popup.closed) {
+            popup.close();
+          }
+        }
+      };
+
+      window.addEventListener('message', messageHandler);
+
       const pollForSession = window.setInterval(async () => {
         try {
           const { data: sessionData } = await authClient.getSession();
           if (sessionData?.session) {
             window.clearInterval(pollForSession);
+            window.removeEventListener('message', messageHandler);
             if (!popup.closed) {
               popup.close();
             }
@@ -65,6 +77,7 @@ export default function LoginView({ initialError }: LoginViewProps) {
 
         if (popup.closed) {
           window.clearInterval(pollForSession);
+          window.removeEventListener('message', messageHandler);
           setIsSigningIn(false);
         }
       }, 750);

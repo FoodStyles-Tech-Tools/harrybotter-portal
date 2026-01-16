@@ -62,6 +62,13 @@ export const auth = betterAuth({
   user: {
     modelName: 'auth_user',
   },
+  advanced: {
+    cookiePrefix: 'harrybotter-portal',
+    defaultCookieAttributes: {
+      sameSite: 'none',
+      secure: true,
+    },
+  },
   onAPIError: {
     errorURL: `${resolvedBaseURL.replace(/\/$/, '')}/login`,
   },
