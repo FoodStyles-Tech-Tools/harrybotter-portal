@@ -6,6 +6,10 @@
         {
           "key": "X-DNS-Prefetch-Control",
           "value": "on"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'self' https://relay-foodstyles-staging.vercel.app https://relay-tracker.vercel.app;"
         }
       ]
     },

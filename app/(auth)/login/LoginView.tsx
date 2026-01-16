@@ -20,10 +20,54 @@ export default function LoginView({ initialError }: LoginViewProps) {
     setError(null);
 
     try {
-      await authClient.signIn.social({
+      const { data, error: signInError } = await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/submit-ticket',
+        disableRedirect: true,
       });
+
+      if (signInError) {
+        throw new Error(signInError.message ?? 'Failed to start Google sign in.');
+      }
+
+      if (!data?.url) {
+        throw new Error('Google sign in did not return a redirect URL.');
+      }
+
+      const width = 500;
+      const height = 600;
+      const left = window.screenX + Math.max(0, (window.outerWidth - width) / 2);
+      const top = window.screenY + Math.max(0, (window.outerHeight - height) / 2);
+      const popup = window.open(
+        data.url,
+        'googleSignIn',
+        `popup=yes,width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      if (!popup) {
+        throw new Error('Popup was blocked. Please allow popups and try again.');
+      }
+
+      const pollForSession = window.setInterval(async () => {
+        try {
+          const { data: sessionData } = await authClient.getSession();
+          if (sessionData?.session) {
+            window.clearInterval(pollForSession);
+            if (!popup.closed) {
+              popup.close();
+            }
+            window.location.assign('/submit-ticket');
+            return;
+          }
+        } catch {
+          // Ignore transient session fetch failures while the popup is open.
+        }
+
+        if (popup.closed) {
+          window.clearInterval(pollForSession);
+          setIsSigningIn(false);
+        }
+      }, 750);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to start Google sign in.';
       setError(message);
@@ -73,7 +117,7 @@ export default function LoginView({ initialError }: LoginViewProps) {
               fill="#EA4335"
             />
           </svg>
-          {isSigningIn ? 'Redirecting to Google…' : 'Continue with Google'}
+          {isSigningIn ? 'Opening Google…' : 'Continue with Google'}
         </button>
 
       </div>
