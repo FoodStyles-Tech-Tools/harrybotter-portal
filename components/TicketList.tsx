@@ -279,7 +279,7 @@ export default function TicketList({
     <>
       <div className="space-y-4">
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4 bg-gray-50 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4 bg-white/60 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] transition-all duration-200 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] hover:bg-white/70">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Ticket ID</label>
             <input
@@ -374,7 +374,7 @@ export default function TicketList({
         {/* Table */}
         <div 
           data-table-container
-          className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+          className="bg-white/70 backdrop-blur-xl backdrop-saturate-150 rounded-3xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.05)] overflow-hidden transition-all duration-200 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.08)]"
         >
           <div className="overflow-x-auto">
             <table className="w-full">

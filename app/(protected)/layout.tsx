@@ -31,7 +31,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
   const userName = typeof session.user?.name === 'string' ? (session.user.name as string) : undefined;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <AppHeader userName={userName} userImage={userImage} />
       <main className="w-full px-8 py-8">{children}</main>
     </div>

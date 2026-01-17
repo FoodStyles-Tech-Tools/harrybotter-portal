@@ -192,25 +192,12 @@ export default function TechToolAssistantPage() {
 
   return (
     // Light Mode Support from the start
-    // bg-gradient-to-b from-white to-blue-50/50 gives the White > Blue effect
-    <div className="flex h-[calc(100vh-9rem)] flex-col bg-gradient-to-b from-white to-indigo-50/50 text-gray-900 font-sans overflow-hidden rounded-2xl mx-auto w-full shadow-sm border border-gray-200/50">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 flex-shrink-0">
-        <div className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
-          <Icons.Sparkles className="w-5 h-5 text-blue-500" />
-          <span className="text-lg font-medium tracking-tight">TechTool Assistant</span>
-        </div>
-        <button
-          onClick={handleReset}
-          className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
-          title="Start new chat"
-        >
-          <Icons.Refresh className="w-5 h-5" />
-        </button>
-      </div>
+    // Transparent/Glass effect to let global gradient show through
+    <div className="flex h-[calc(100vh-9rem)] flex-col backdrop-blur-sm text-gray-900 font-sans overflow-hidden mx-auto w-full">
+      {/* Header Removed as per user request */}
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto w-full max-w-4xl mx-auto p-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto w-full mx-auto p-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
         {!chatUrl ? (
           <div className="mt-20 flex flex-col items-center text-center p-8 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
             <p className="text-gray-500">
@@ -297,7 +284,7 @@ export default function TechToolAssistantPage() {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 w-full max-w-4xl mx-auto flex-shrink-0">
+      <div className="p-4 w-full mx-auto flex-shrink-0">
         <div 
           className={`flex items-center gap-3 bg-white rounded-full px-4 py-3 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.1)] border border-gray-100 focus-within:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] focus-within:border-blue-100 transition-all duration-300 ${
             !chatUrl ? "opacity-50 pointer-events-none" : ""
