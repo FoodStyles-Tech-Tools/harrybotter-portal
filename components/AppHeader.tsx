@@ -77,7 +77,7 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
     : '?';
 
   return (
-    <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl backdrop-saturate-150 border-b border-white/20 transition-all duration-300 shadow-sm/5">
+    <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl backdrop-saturate-150 border-b border-white/20 transition-all duration-300 shadow-[0_8px_32px_0_rgba(31,38,135,0.04)]">
       <div className="w-full px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-12">
           {/* Main Title / Brand */}

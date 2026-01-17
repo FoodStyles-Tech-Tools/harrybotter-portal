@@ -73,10 +73,10 @@ export default function SubmitTicketPage() {
 
   return (
     <>
-      <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Submit New Tickets</h2>
-          <p className="text-sm text-gray-600">
+      <div className="w-full bg-white/60 backdrop-blur-xl backdrop-saturate-150 rounded-3xl p-8 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] font-outfit">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">Submit New Tickets</h2>
+          <p className="text-base text-gray-600 max-w-2xl leading-relaxed">
             Use this section to request features, report bugs, or ask for assistance. Add multiple tickets easily using the &apos;+&apos; button in each row.
           </p>
         </div>

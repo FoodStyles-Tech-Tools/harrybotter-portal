@@ -6,20 +6,20 @@ import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
 import TicketDrawer from './TicketDrawer';
 import type { Ticket, Project } from '@/types';
 
-const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  Open: { bg: 'bg-gray-100', text: 'text-gray-700' },
-  'In Progress': { bg: 'bg-yellow-100', text: 'text-yellow-800' },
-  Completed: { bg: 'bg-green-100', text: 'text-green-800' },
-  Cancelled: { bg: 'bg-red-100', text: 'text-red-800' },
-  Rejected: { bg: 'bg-red-100', text: 'text-red-800' },
-  'On Hold': { bg: 'bg-gray-800', text: 'text-gray-100' },
-  Blocked: { bg: 'bg-orange-100', text: 'text-orange-800' },
+const STATUS_COLORS: Record<string, { bg: string; text: string; ring: string }> = {
+  Open: { bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'ring-emerald-600/10' },
+  'In Progress': { bg: 'bg-amber-50', text: 'text-amber-700', ring: 'ring-amber-600/10' },
+  Completed: { bg: 'bg-blue-50', text: 'text-blue-700', ring: 'ring-blue-600/10' },
+  Cancelled: { bg: 'bg-gray-50', text: 'text-gray-600', ring: 'ring-gray-600/10' },
+  Rejected: { bg: 'bg-rose-50', text: 'text-rose-700', ring: 'ring-rose-600/10' },
+  'On Hold': { bg: 'bg-slate-50', text: 'text-slate-700', ring: 'ring-slate-600/10' },
+  Blocked: { bg: 'bg-orange-50', text: 'text-orange-700', ring: 'ring-orange-600/10' },
 };
 
-const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
-  Request: { bg: 'bg-blue-100', text: 'text-blue-800' },
-  Bug: { bg: 'bg-red-100', text: 'text-red-800' },
-  Task: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
+const TYPE_COLORS: Record<string, { bg: string; text: string; ring: string }> = {
+  Request: { bg: 'bg-indigo-50', text: 'text-indigo-700', ring: 'ring-indigo-600/10' },
+  Bug: { bg: 'bg-rose-50', text: 'text-rose-700', ring: 'ring-rose-600/10' },
+  Task: { bg: 'bg-cyan-50', text: 'text-cyan-700', ring: 'ring-cyan-600/10' },
 };
 
 interface TicketListProps {
@@ -374,7 +374,7 @@ export default function TicketList({
         {/* Table */}
         <div 
           data-table-container
-          className="bg-white/70 backdrop-blur-xl backdrop-saturate-150 rounded-3xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.05)] overflow-hidden transition-all duration-200 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.08)]"
+          className="bg-white/70 backdrop-blur-xl backdrop-saturate-150 rounded-3xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.05)] overflow-hidden transition-all duration-200 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.08)] font-outfit"
         >
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -389,34 +389,34 @@ export default function TicketList({
                 <col style={{ width: '10%' }} />
                 <col style={{ width: '11%' }} />
               </colgroup>
-              <thead className="bg-gray-50">
+              <thead className="bg-[#f8fafd] border-b border-gray-100">
                 <tr>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                     ID
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                     Title
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                     Project
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                     Requester
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                     Assignee
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                     Type
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                     Priority
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                     Status
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Created At
+                  <th className="px-4 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                    Created
                   </th>
                 </tr>
               </thead>
@@ -534,11 +534,13 @@ export default function TicketList({
                             </span>
                           </td>
                           <td className="px-3 py-3 text-sm text-gray-600 break-words">{ticket.priority}</td>
-                          <td className="px-3 py-3 text-sm">
+                          <td className="px-4 py-4 text-sm">
                             <span
-                              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                                STATUS_COLORS[ticket.status]?.bg || 'bg-gray-100'
-                              } ${STATUS_COLORS[ticket.status]?.text || 'text-gray-700'}`}
+                              className={`inline-flex items-center px-2.5 py-0.5 text-[11px] font-bold rounded-full ring-1 ring-inset ${
+                                STATUS_COLORS[ticket.status]?.bg || 'bg-gray-50'
+                              } ${STATUS_COLORS[ticket.status]?.text || 'text-gray-600'} ${
+                                STATUS_COLORS[ticket.status]?.ring || 'ring-gray-600/10'
+                              } uppercase tracking-wider`}
                             >
                               {ticket.status}
                             </span>

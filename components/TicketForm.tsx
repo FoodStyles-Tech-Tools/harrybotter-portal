@@ -4,6 +4,15 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
 import type { TeamMember, Project, TicketFormData } from '@/types';
 
+const Icons = {
+  Plus: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
+  ),
+};
+
 const TYPE_OPTIONS = [
   {
     value: 'Request' as const,
@@ -382,10 +391,10 @@ export default function TicketForm({
   }, [project?.id, initialProjects, assigneeOptions, assignee, updateState]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-white/40 rounded-2xl border border-white/60 shadow-sm">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-2 ml-1">
             Project (Optional)
           </label>
           <SearchableDropdown
@@ -398,7 +407,7 @@ export default function TicketForm({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-2 ml-1">
             Assignee (Optional)
           </label>
           <SearchableDropdown
@@ -418,32 +427,30 @@ export default function TicketForm({
           <button
             type="button"
             onClick={addTicketRow}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-blue-600 bg-blue-50/50 border border-blue-200 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm hover:shadow-blue-200 active:scale-[0.98]"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <Icons.Plus className="w-4 h-4" />
             Add Row
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">
+              <tr className="bg-gray-50/80 border-b border-gray-100">
+                <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">
                   Details *
                 </th>
-                <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold text-gray-700" style={{ width: '14%' }}>
-                  Expected Done Date
+                <th className="px-3 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest" style={{ width: '14%' }}>
+                  Expected Done
                 </th>
-                <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold text-gray-700" style={{ width: '12%' }}>
+                <th className="px-3 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest" style={{ width: '12%' }}>
                   Type
                 </th>
-                <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold text-gray-700" style={{ width: '12%' }}>
+                <th className="px-3 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest" style={{ width: '12%' }}>
                   Priority
                 </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-700 w-20">
+                <th className="px-4 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-widest w-20">
                   Actions
                 </th>
               </tr>
@@ -627,11 +634,11 @@ export default function TicketForm({
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-4">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
+          className="flex items-center gap-2.5 px-8 py-3.5 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-blue-200 hover:shadow-blue-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
         >
           {isSubmitting ? (
             <>
@@ -639,12 +646,12 @@ export default function TicketForm({
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-              Submitting...
+              Processing...
             </>
           ) : (
             <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
               Submit Tickets
             </>
