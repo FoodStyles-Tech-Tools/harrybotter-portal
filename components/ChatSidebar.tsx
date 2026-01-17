@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 interface ChatSession {
   id: string;
   title: string;
+  ticket_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -52,6 +53,13 @@ const Icons = {
       <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
     </svg>
   ),
+  Trash: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+    </svg>
+  ),
 };
 
 function formatRelativeTime(dateString: string) {
@@ -69,6 +77,7 @@ function formatRelativeTime(dateString: string) {
 export default function ChatSidebar({ currentSessionId, onSelectSession, onNewChat }: ChatSidebarProps) {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchSessions = async () => {
     try {
@@ -87,6 +96,29 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
   useEffect(() => {
     void fetchSessions();
   }, [currentSessionId]);
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (deletingId === id) {
+      try {
+        const res = await fetch(`/api/chat/sessions?id=${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          setSessions(prev => prev.filter(s => s.id !== id));
+          if (currentSessionId === id) {
+            onNewChat();
+          }
+        }
+      } catch (error) {
+        console.error('Failed to delete session', error);
+      } finally {
+        setDeletingId(null);
+      }
+    } else {
+      setDeletingId(id);
+      // Auto-reset after 3s
+      setTimeout(() => setDeletingId(prev => prev === id ? null : prev), 3000);
+    }
+  };
 
   return (
     <div className="w-64 h-full bg-[#f0f4f9] flex flex-col flex-shrink-0 z-20 font-outfit border-r border-gray-200/50">
@@ -137,14 +169,53 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
                   <div className={`p-1.5 rounded-lg flex-shrink-0 transition-colors ${
                     currentSessionId === session.id ? 'bg-blue-500/50 text-white' : 'bg-gray-200/40 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-400'
                   }`}>
-                    <Icons.Chat className="w-4 h-4" />
+                    {session.ticket_id ? (
+                      <Icons.Sparkles className="w-4 h-4" />
+                    ) : (
+                      <Icons.Chat className="w-4 h-4" />
+                    )}
                   </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="truncate font-medium">{session.title || 'Untitled'}</span>
-                    <span className={`text-[10px] mt-0.5 ${currentSessionId === session.id ? 'text-blue-100' : 'text-gray-400'}`}>
-                      {formatRelativeTime(session.updated_at)}
-                    </span>
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2 overflow-hidden">
+                      <span className="truncate font-medium">{session.ticket_id || session.title || 'Untitled'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5 whitespace-nowrap overflow-hidden">
+                      <span className={`text-[10px] ${currentSessionId === session.id ? 'text-blue-100' : 'text-gray-400'}`}>
+                        {formatRelativeTime(session.updated_at)}
+                      </span>
+                      {session.ticket_id && (
+                        <>
+                          <span className={`text-[10px] opacity-40 ${currentSessionId === session.id ? 'text-white' : 'text-gray-400'}`}>•</span>
+                          <span className={`px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest ${
+                            currentSessionId === session.id 
+                            ? 'bg-white/20 text-white shadow-sm' 
+                            : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                          }`}>
+                            Created
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Delete Button */}
+                  <button
+                    onClick={(e) => handleDelete(e, session.id)}
+                    className={`p-1.5 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 flex-shrink-0 ${
+                      deletingId === session.id
+                        ? 'bg-red-500 text-white opacity-100 animate-pulse'
+                        : currentSessionId === session.id
+                        ? 'hover:bg-blue-500 text-white'
+                        : 'hover:bg-red-50 text-red-500'
+                    }`}
+                    title={deletingId === session.id ? 'Confirm delete' : 'Delete chat'}
+                  >
+                    {deletingId === session.id ? (
+                      <span className="text-[10px] font-bold px-1 uppercase">Confirm?</span>
+                    ) : (
+                      <Icons.Trash className="w-3.5 h-3.5" />
+                    )}
+                  </button>
                 </button>
               ))
             )}

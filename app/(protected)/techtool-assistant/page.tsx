@@ -25,16 +25,40 @@ function parseButtons(text: string) {
 }
 
 function extractResponseText(response: unknown) {
-  if (!response || typeof response !== "object") {
-    return String(response ?? "");
+  if (!response) return "";
+
+  let data = response;
+
+  // If it's a string, try to parse it as JSON in case the bot returned a JSON string
+  if (typeof data === "string") {
+    const trimmed = data.trim();
+    if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (parsed && typeof parsed === "object") {
+          data = parsed;
+        }
+      } catch {
+        // Not valid JSON, continue
+      }
+    }
   }
 
-  const record = response as Record<string, unknown>;
-  const candidate = record.output ?? record.text ?? record.message;
+  let record: any = data;
+  if (Array.isArray(data) && data.length > 0) {
+    record = data[0];
+  }
+
+  if (typeof record !== "object" || record === null) {
+    return String(record ?? "");
+  }
+
+  const candidate = record.output ?? record.text ?? record.message ?? record.Reply ?? record.reply ?? record.response;
   if (typeof candidate === "string") {
     return candidate;
   }
 
+  // Fallback to stringified object if no common fields found
   try {
     return JSON.stringify(record, null, 2);
   } catch {
@@ -54,7 +78,99 @@ const Icons = {
       <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
     </svg>
   ),
+  Ticket: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.69.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4" />
+      <path d="M2 9h20" />
+      <path d="M14 15h3" />
+    </svg>
+  ),
+  Plus: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  ),
 };
+
+function MarkdownMessage({ text, onAction, disabled }: { text: string; onAction: (text: string) => void; disabled?: boolean }) {
+  // Try to parse text as JSON in case it's a raw JSON string from history
+  let content = text;
+  if (typeof text === "string" && text.trim().startsWith("{")) {
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed && typeof parsed === "object") {
+        content = parsed.output ?? parsed.text ?? parsed.message ?? parsed.Reply ?? parsed.reply ?? parsed.response ?? text;
+      }
+    } catch {
+      // Not valid JSON, keep original
+    }
+  }
+
+  // Detect raw ticket IDs and convert them to markdown-like parts for consistent rendering
+  const parts = content.split(/(\[.*?\]\(.*?\)|HRB-\d+)/gi);
+
+  return (
+    <div className="space-y-4">
+      <div className="leading-relaxed">
+        {parts.map((part, i) => {
+          // Check if part is a markdown link
+          const markdownMatch = part.match(/\[(.*?)\]\((.*?)\)/);
+          if (markdownMatch) {
+            const [, label, url] = markdownMatch;
+            const isTicketLink = url.includes("check-ticket") || label.match(/HRB-\d+/i);
+            return (
+              <a
+                key={i}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-blue-600 font-bold hover:underline decoration-2 underline-offset-4 decoration-blue-200"
+                title={url}
+              >
+                {isTicketLink && <Icons.Ticket className="w-4 h-4" />}
+                {label}
+              </a>
+            );
+          }
+          
+          // Check if part is a raw ticket ID
+          const rawTicketMatch = part.match(/^HRB-\d+$/i);
+          if (rawTicketMatch) {
+            const ticketId = part.toUpperCase();
+            return (
+              <a
+                key={i}
+                href={`/check-ticket?ticket=${ticketId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-blue-600 font-bold hover:underline decoration-2 underline-offset-4 decoration-blue-200"
+              >
+                <Icons.Ticket className="w-4 h-4" />
+                {ticketId}
+              </a>
+            );
+          }
+
+          return <span key={i}>{part}</span>;
+        })}
+      </div>
+      
+      {/* Contextual Action Buttons */}
+      {text.includes("Do you want me to go ahead and forward this to TechTool as a ticket?") && (
+        <div className="pt-2">
+           <button
+             onClick={() => onAction("Yes")}
+             disabled={disabled}
+             className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-200 hover:bg-blue-700 hover:shadow-lg transition-all active:scale-95 group disabled:opacity-50 disabled:bg-gray-400 disabled:shadow-none disabled:pointer-events-none"
+           >
+             <Icons.Plus className="w-4 h-4" />
+             Create Ticket
+           </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function TechToolAssistantPage() {
   const chatUrl = process.env.NEXT_PUBLIC_N8N_CHAT_URL;
@@ -62,6 +178,7 @@ export default function TechToolAssistantPage() {
   const user = sessionState?.data?.user;
   
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [currentTicketId, setCurrentTicketId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -82,6 +199,14 @@ export default function TechToolAssistantPage() {
         if (res.ok) {
           const data = await res.json();
           setMessages(data);
+        }
+        
+        // Also fetch session info to check for ticket_id
+        const sessionRes = await fetch('/api/chat/sessions');
+        if (sessionRes.ok) {
+          const sessions = await sessionRes.json();
+          const session = sessions.find((s: any) => s.id === currentSessionId);
+          setCurrentTicketId(session?.ticket_id ?? null);
         }
       } catch (error) {
         console.error("Failed to fetch messages", error);
@@ -206,6 +331,20 @@ export default function TechToolAssistantPage() {
       
       // Persist bot message
       void saveMessageToDb(sessionId, "bot", displayText, buttons.length > 0 ? buttons : undefined);
+
+      // Ticket Detection Logic
+      const ticketMatch = displayText.match(/HRB-\d+/i);
+      if (ticketMatch) {
+        const ticketId = ticketMatch[0].toUpperCase();
+        setCurrentTicketId(ticketId);
+        
+        // Update session in DB
+        void fetch('/api/chat/sessions', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, ticketId }),
+        });
+      }
     } catch (error) {
       const errorMessage: ChatMessage = {
         id: crypto.randomUUID(),
@@ -229,6 +368,7 @@ export default function TechToolAssistantPage() {
 
   const handleNewChat = () => {
     setCurrentSessionId(null);
+    setCurrentTicketId(null);
     setMessages([]);
   };
 
@@ -301,7 +441,11 @@ export default function TechToolAssistantPage() {
                           : "text-gray-800 pt-2"
                       }`}
                     >
-                      {message.text}
+                      {message.sender === "bot" ? (
+                        <MarkdownMessage text={message.text} onAction={sendMessage} disabled={isSending || !!currentTicketId} />
+                      ) : (
+                        message.text
+                      )}
                     </div>
 
                     {/* Buttons (if any) */}
@@ -342,38 +486,55 @@ export default function TechToolAssistantPage() {
         {/* Input Area */}
         <div className="p-4 w-full flex-shrink-0 lg:px-12">
           <div className="max-w-4xl mx-auto">
-            <div 
-              className={`flex items-center gap-3 bg-white rounded-full px-4 py-3 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.1)] border border-gray-100 focus-within:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] focus-within:border-blue-100 transition-all duration-300 ${
-                !chatUrl ? "opacity-50 pointer-events-none" : ""
-              }`}
-            >
-              <input
-                value={inputValue}
-                onChange={(event) => setInputValue(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" && !event.shiftKey) {
-                    event.preventDefault();
-                    handleSend();
-                  }
-                }}
-                placeholder="Tell us what you need"
-                className="flex-1 bg-transparent border-none outline-none text-gray-900 text-base placeholder-gray-500 h-full py-1 ml-2"
-                disabled={isSending || !chatUrl || !user}
-              />
-              
-              <button
-                type="button"
-                onClick={handleSend}
-                disabled={!canSend || isSending}
-                className={`p-2 rounded-full transition-all duration-200 ${
-                   inputValue.trim().length > 0 
-                   ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm" 
-                   : "bg-transparent text-gray-400 hover:text-gray-600"
+            {currentTicketId ? (
+              <div className="flex items-center justify-center gap-3 bg-blue-50/50 rounded-full px-6 py-4 border border-blue-100 mb-2 animate-in fade-in duration-500">
+                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center flex-shrink-0 animate-bounce">
+                  <Icons.Sparkles className="w-4 h-4" />
+                </div>
+                <p className="text-sm font-semibold text-blue-800">
+                  Ticket <span className="underline">{currentTicketId}</span> has been created. This chat is now locked.
+                </p>
+                <button 
+                  onClick={handleNewChat}
+                  className="ml-4 px-4 py-1.5 bg-white text-blue-600 border border-blue-200 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition-all duration-200"
+                >
+                  Start New Chat
+                </button>
+              </div>
+            ) : (
+              <div 
+                className={`flex items-center gap-3 bg-white rounded-full px-4 py-3 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.1)] border border-gray-100 focus-within:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] focus-within:border-blue-100 transition-all duration-300 ${
+                  !chatUrl ? "opacity-50 pointer-events-none" : ""
                 }`}
               >
-                <Icons.Send className="w-5 h-5" />
-              </button>
-            </div>
+                <input
+                  value={inputValue}
+                  onChange={(event) => setInputValue(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                      event.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  placeholder="Tell us what you need"
+                  className="flex-1 bg-transparent border-none outline-none text-gray-900 text-base placeholder-gray-500 h-full py-1 ml-2"
+                  disabled={isSending || !chatUrl || !user}
+                />
+                
+                <button
+                  type="button"
+                  onClick={handleSend}
+                  disabled={!canSend || isSending}
+                  className={`p-2 rounded-full transition-all duration-200 ${
+                    inputValue.trim().length > 0 
+                     ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm" 
+                     : "bg-transparent text-gray-400 hover:text-gray-600"
+                  }`}
+                >
+                  <Icons.Send className="w-5 h-5" />
+                </button>
+              </div>
+            )}
             
             <div className="text-center mt-3">
               <p className="text-xs text-gray-400">
