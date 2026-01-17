@@ -23,6 +23,7 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
   };
 
   const navItems = [
+    { href: '/techtool-assistant', label: 'TechTool Assistant' },
     { href: '/submit-ticket', label: 'Submit Ticket' },
     { href: '/check-ticket', label: 'Check Ticket' },
   ];

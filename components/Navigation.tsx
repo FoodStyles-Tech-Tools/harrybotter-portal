@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 interface NavigationProps {
-  activeTab: 'submit' | 'check';
+  activeTab: 'assistant' | 'submit' | 'check';
 }
 
 export default function Navigation({ activeTab }: NavigationProps) {
@@ -10,6 +10,16 @@ export default function Navigation({ activeTab }: NavigationProps) {
 
   return (
     <nav className="flex gap-2 flex-wrap">
+      <Link
+        href="/techtool-assistant"
+        className={`${baseClasses} ${
+          activeTab === 'assistant'
+            ? 'bg-blue-600 border-blue-600 text-white shadow-md'
+            : 'bg-transparent border-gray-300 text-blue-600 hover:bg-blue-50'
+        }`}
+      >
+        TechTool Assistant
+      </Link>
       <Link
         href="/submit-ticket"
         className={`${baseClasses} ${
