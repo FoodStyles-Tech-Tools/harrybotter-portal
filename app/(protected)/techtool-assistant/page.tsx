@@ -94,7 +94,7 @@ const Icons = {
   ),
 };
 
-function MarkdownMessage({ text, onAction, disabled }: { text: string; onAction: (text: string) => void; disabled?: boolean }) {
+function MarkdownMessage({ text, onAction, disabled, isLatest }: { text: string; onAction: (text: string) => void; disabled?: boolean; isLatest?: boolean }) {
   // Try to parse text as JSON in case it's a raw JSON string from history
   let content = text;
   if (typeof text === "string" && text.trim().startsWith("{")) {
@@ -155,8 +155,8 @@ function MarkdownMessage({ text, onAction, disabled }: { text: string; onAction:
         </ReactMarkdown>
       </div>
       
-      {/* Contextual Action Buttons */}
-      {content.includes("Do you want me to go ahead and forward this to TechTool as a ticket?") && (
+      {/* Contextual Action Buttons - Only show on latest message */}
+      {isLatest && content.includes("Do you want me to go ahead and forward this to TechTool as a ticket?") && (
         <div className="pt-2">
            <button
              onClick={() => onAction("Yes")}
@@ -419,7 +419,7 @@ export default function TechToolAssistantPage() {
           ) : (
             // Chat Messages
             <div className="space-y-8 pb-12 w-full max-w-4xl mx-auto">
-              {messages.map((message) => (
+              {messages.map((message, index) => (
                 <div
                   key={message.id}
                   className={`flex gap-4 ${
@@ -442,7 +442,12 @@ export default function TechToolAssistantPage() {
                       }`}
                     >
                       {message.sender === "bot" ? (
-                        <MarkdownMessage text={message.text} onAction={sendMessage} disabled={isSending || !!currentTicketId} />
+                        <MarkdownMessage 
+                          text={message.text} 
+                          onAction={sendMessage} 
+                          disabled={isSending || !!currentTicketId} 
+                          isLatest={index === messages.length - 1}
+                        />
                       ) : (
                         message.text
                       )}
