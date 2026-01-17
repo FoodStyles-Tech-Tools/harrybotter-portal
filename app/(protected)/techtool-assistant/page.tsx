@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import ChatSidebar from "@/components/ChatSidebar";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type ChatMessage = {
   id: string;
@@ -106,57 +108,55 @@ function MarkdownMessage({ text, onAction, disabled }: { text: string; onAction:
     }
   }
 
-  // Detect raw ticket IDs and convert them to markdown-like parts for consistent rendering
-  const parts = content.split(/(\[.*?\]\(.*?\)|HRB-\d+)/gi);
+  // Detect raw ticket IDs and convert them to markdown links for ReactMarkdown to handle
+  // We do this by replacing HRB-\d+ that are NOT already part of a markdown link
+  const processedContent = content.replace(/(?<!\[)HRB-\d+(?!(\]|\]\(.*?\)))/gi, (match) => {
+    return `[${match}](/check-ticket?ticket=${match.toUpperCase()})`;
+  });
 
   return (
     <div className="space-y-4">
-      <div className="leading-relaxed">
-        {parts.map((part, i) => {
-          // Check if part is a markdown link
-          const markdownMatch = part.match(/\[(.*?)\]\((.*?)\)/);
-          if (markdownMatch) {
-            const [, label, url] = markdownMatch;
-            const isTicketLink = url.includes("check-ticket") || label.match(/HRB-\d+/i);
-            return (
-              <a
-                key={i}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-blue-600 font-bold hover:underline decoration-2 underline-offset-4 decoration-blue-200"
-                title={url}
-              >
-                {isTicketLink && <Icons.Ticket className="w-4 h-4" />}
-                {label}
-              </a>
-            );
-          }
-          
-          // Check if part is a raw ticket ID
-          const rawTicketMatch = part.match(/^HRB-\d+$/i);
-          if (rawTicketMatch) {
-            const ticketId = part.toUpperCase();
-            return (
-              <a
-                key={i}
-                href={`/check-ticket?ticket=${ticketId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-blue-600 font-bold hover:underline decoration-2 underline-offset-4 decoration-blue-200"
-              >
-                <Icons.Ticket className="w-4 h-4" />
-                {ticketId}
-              </a>
-            );
-          }
-
-          return <span key={i}>{part}</span>;
-        })}
+      <div className="text-gray-800 leading-relaxed">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            a: ({ ...props }) => {
+              const url = props.href || "";
+              const label = String(props.children || "");
+              const isTicketLink = url.includes("check-ticket") || label.match(/HRB-\d+/i);
+              
+              return (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-blue-600 font-bold hover:underline decoration-2 underline-offset-4 decoration-blue-200"
+                >
+                  {isTicketLink && <Icons.Ticket className="w-3.5 h-3.5" />}
+                  {props.children}
+                </a>
+              );
+            },
+            // Handle standard markdown elements with custom styling
+            strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
+            em: ({ children }) => <em className="italic">{children}</em>,
+            ul: ({ children }) => <ul className="list-disc pl-5 my-3 space-y-1.5">{children}</ul>,
+            ol: ({ children }) => <ol className="list-decimal pl-5 my-3 space-y-1.5">{children}</ol>,
+            li: ({ children }) => <li className="pl-1">{children}</li>,
+            p: ({ children }) => <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>,
+            h1: ({ children }) => <h1 className="text-2xl font-bold my-4 text-gray-900">{children}</h1>,
+            h2: ({ children }) => <h2 className="text-xl font-bold my-3 text-gray-900">{children}</h2>,
+            h3: ({ children }) => <h3 className="text-lg font-bold my-2 text-gray-900">{children}</h3>,
+            code: ({ children }) => <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm text-red-600">{children}</code>,
+            pre: ({ children }) => <pre className="bg-gray-900 text-gray-100 p-4 rounded-xl my-4 overflow-x-auto font-mono text-sm">{children}</pre>,
+          }}
+        >
+          {processedContent}
+        </ReactMarkdown>
       </div>
       
       {/* Contextual Action Buttons */}
-      {text.includes("Do you want me to go ahead and forward this to TechTool as a ticket?") && (
+      {content.includes("Do you want me to go ahead and forward this to TechTool as a ticket?") && (
         <div className="pt-2">
            <button
              onClick={() => onAction("Yes")}
