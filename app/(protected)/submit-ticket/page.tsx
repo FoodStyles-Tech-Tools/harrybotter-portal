@@ -61,9 +61,9 @@ export default function SubmitTicketPage() {
 
       const firstTicketId = data.ticketIds?.[0];
       if (firstTicketId) {
-        router.push(`/check-ticket?ticket=${firstTicketId}`);
+        router.push(`/tickets?ticket=${firstTicketId}`);
       } else {
-        router.push('/check-ticket');
+        router.push('/tickets');
       }
     } catch (err: any) {
       error(err.message || 'Failed to submit ticket(s). Please try again.');
@@ -73,14 +73,8 @@ export default function SubmitTicketPage() {
 
   return (
     <>
-      <div className="px-8 py-8 md:px-12 md:py-10">
-        <div className="w-full bg-white/60 backdrop-blur-xl backdrop-saturate-150 rounded-3xl p-8 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] font-outfit">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">Submit New Tickets</h2>
-            <p className="text-base text-gray-600 max-w-2xl leading-relaxed">
-              Use this section to request features, report bugs, or ask for assistance. Add multiple tickets easily using the &apos;+&apos; button in each row.
-            </p>
-          </div>
+      <div className="flex-1 w-full px-4 md:px-6 py-6 flex flex-col font-outfit">
+        <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-1 md:p-2 border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]">
           <TicketForm
             onSubmit={handleTicketSubmit}
             currentUser={currentUser}

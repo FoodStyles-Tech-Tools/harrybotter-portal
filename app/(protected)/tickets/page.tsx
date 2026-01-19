@@ -22,15 +22,9 @@ export default function CheckTicketPage() {
   }, [searchParams]);
 
   return (
-    <div className="px-8 py-8 md:px-12 md:py-10">
-      <div className="w-full bg-white/60 backdrop-blur-xl backdrop-saturate-150 rounded-3xl p-8 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] font-outfit">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">Ticket Overview</h2>
-          <p className="text-base text-gray-600 max-w-2xl">
-             Track your requested tickets and system updates in real-time.
-          </p>
-        </div>
-        <TicketList initialTicketIdFilter={initialTicketId ?? undefined} initialRequesterName={requesterName ?? undefined} />
+    <div className="flex-1 w-full flex flex-col font-outfit">
+      <div className="flex-1 bg-white/40 backdrop-blur-xl overflow-hidden">
+        <TicketList />
       </div>
     </div>
   );

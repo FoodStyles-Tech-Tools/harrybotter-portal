@@ -63,8 +63,7 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
 
   const navItems = [
     { href: '/chat', label: 'Chat', icon: Icons.Chat },
-    { href: '/submit-ticket', label: 'Submit Ticket', icon: Icons.Plus },
-    { href: '/check-ticket', label: 'Check Ticket', icon: Icons.List },
+    { href: '/tickets', label: 'Ticket', icon: Icons.List },
   ];
 
   const initials = userName
@@ -78,7 +77,7 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
 
   return (
     <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl backdrop-saturate-150 border-b border-white/20 transition-all duration-300 shadow-[0_8px_32px_0_rgba(31,38,135,0.04)]">
-      <div className="w-full px-8 py-4 flex items-center justify-between">
+      <div className="w-full px-8 py-3 flex items-center justify-between">
         <div className="flex items-center gap-12">
           {/* Main Title / Brand */}
           <Link href="/chat" className="flex items-center gap-2 group">
@@ -101,7 +100,7 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
                     isActive
                       ? 'bg-blue-50 text-blue-700 shadow-sm ring-1 ring-blue-100'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
@@ -113,6 +112,16 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
               );
             })}
           </nav>
+
+          <div className="h-4 w-[1px] bg-gray-200 mx-2 hidden md:block" />
+
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('open-quick-add'))}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-blue-600 text-white shadow-md shadow-blue-500/20 hover:bg-blue-700 hover:shadow-lg transition-all active:scale-[0.98] uppercase tracking-wider"
+          >
+            <Icons.Plus className="w-3.5 h-3.5" strokeWidth={3} />
+            Create
+          </button>
         </div>
 
         {/* User User Profile */}

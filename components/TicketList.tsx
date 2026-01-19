@@ -16,10 +16,48 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; ring: string }> 
   Blocked: { bg: 'bg-orange-50', text: 'text-orange-700', ring: 'ring-orange-600/10' },
 };
 
-const TYPE_COLORS: Record<string, { bg: string; text: string; ring: string }> = {
-  Request: { bg: 'bg-indigo-50', text: 'text-indigo-700', ring: 'ring-indigo-600/10' },
-  Bug: { bg: 'bg-rose-50', text: 'text-rose-700', ring: 'ring-rose-600/10' },
-  Task: { bg: 'bg-cyan-50', text: 'text-cyan-700', ring: 'ring-cyan-600/10' },
+const Icons = {
+  Plus: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M5 12h14" /><path d="M12 5v14" />
+    </svg>
+  ),
+  Search: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+    </svg>
+  ),
+  ChevronLeft: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="m15 18-6-6 6-6" />
+    </svg>
+  ),
+  ChevronRight: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="m9 18 6-6-6-6" />
+    </svg>
+  ),
+  Bug: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="m8 2 1.88 1.88" />
+      <path d="M14.12 3.88 16 2" />
+      <path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1" />
+      <path d="M12 20c-3.31 0-6-2.69-6-6v-1h4v-3H6V8c0-3.31 2.69-6 6-6s6 2.69 6 6v2h-4v3h4v1c0 3.31-2.69 6-6 6Z" />
+      <path d="M12 20v-9" />
+      <path d="M6.53 9C4.6 8.8 3 7.1 3 5" />
+      <path d="M6 13H3" />
+      <path d="M6.53 17c-1.93.2-3.53 1.9-3.53 4" />
+      <path d="M17.47 9c1.93-.2 3.53-1.9 3.53-4" />
+      <path d="M18 13h3" />
+      <path d="M17.47 17c1.93.2 3.53-1.9 3.53 4" />
+    </svg>
+  ),
+  Request: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M2 9V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 0 0 6v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 0 0-6Z"/>
+      <path d="M13 3v18" opacity="0.3"/>
+    </svg>
+  ),
 };
 
 interface TicketListProps {
@@ -63,6 +101,7 @@ export default function TicketList({
   const [projectFilter, setProjectFilter] = useState<DropdownOption | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [typeFilter, setTypeFilter] = useState<string>('');
+  const [priorityFilter, setPriorityFilter] = useState<string>('');
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -118,6 +157,9 @@ export default function TicketList({
 
       // Type filter
       if (typeFilter && ticket.type !== typeFilter) return false;
+
+      // Priority filter
+      if (priorityFilter && ticket.priority !== priorityFilter) return false;
 
       return true;
     });
@@ -277,11 +319,26 @@ export default function TicketList({
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-5">
+        <div className="flex items-center justify-between px-5 pt-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
+              {filteredTickets.length} Tickets Found
+            </span>
+          </div>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('open-quick-add'))}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-xs font-bold rounded-xl shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-[0.98] uppercase tracking-wider"
+          >
+            <Icons.Plus className="w-4 h-4 text-blue-600" />
+            New Ticket
+          </button>
+        </div>
+
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4 bg-white/60 backdrop-blur-xl backdrop-saturate-150 rounded-2xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] transition-all duration-200 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] hover:bg-white/70">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-5 bg-white border-b border-gray-100 shadow-sm transition-all duration-200">
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Ticket ID</label>
+            <label className="block text-[10px] font-bold text-gray-400 mb-2 ml-1 uppercase tracking-widest">Ticket ID</label>
             <input
               type="text"
               value={ticketIdFilter}
@@ -290,11 +347,11 @@ export default function TicketList({
                 setCurrentPage(1);
               }}
               placeholder="HRB-123..."
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-[38px] px-3 text-[13px] bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium placeholder:text-gray-300"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Search Title</label>
+            <label className="block text-[10px] font-bold text-gray-400 mb-2 ml-1 uppercase tracking-widest">Search Title</label>
             <input
               type="text"
               value={searchFilter}
@@ -302,387 +359,258 @@ export default function TicketList({
                 setSearchFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Search by title..."
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Search..."
+              className="w-full h-[38px] px-3 text-[13px] bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium placeholder:text-gray-300"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Requester</label>
-            <SearchableDropdown
-              options={requesters}
-              placeholder="Filter by requester..."
-              value={requesterFilter?.id}
-              onSelect={(option) => {
-                setRequesterFilter(option);
-                setCurrentPage(1);
-              }}
-              allowClear
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Project</label>
-            <SearchableDropdown
-              options={projectOptions}
-              placeholder="Filter by project..."
-              value={projectFilter?.id}
-              onSelect={(option) => {
-                setProjectFilter(option);
-                setCurrentPage(1);
-              }}
-              allowClear
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
+            <label className="block text-[10px] font-bold text-gray-400 mb-2 ml-1 uppercase tracking-widest">Status</label>
             <select
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-[38px] px-3 text-[13px] bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium appearance-none cursor-pointer"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center', backgroundSize: '14px' }}
             >
               <option value="">All Statuses</option>
-              <option value="Open">Open</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Blocked">Blocked</option>
-              <option value="Cancelled">Cancelled</option>
-              <option value="Completed">Completed</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Type</label>
-            <select
-              value={typeFilter}
-              onChange={(e) => {
-                setTypeFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Types</option>
-              {Object.keys(TYPE_COLORS).map((type) => (
-                <option key={type} value={type}>
-                  {type}
+              {Object.keys(STATUS_COLORS).map((status) => (
+                <option key={status} value={status}>
+                  {status}
                 </option>
               ))}
             </select>
           </div>
+          <div>
+            <label className="block text-[10px] font-bold text-gray-400 mb-2 ml-1 uppercase tracking-widest">Priority</label>
+            <select
+              value={priorityFilter}
+              onChange={(e) => {
+                setPriorityFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full h-[38px] px-3 text-[13px] bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium appearance-none cursor-pointer"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center', backgroundSize: '14px' }}
+            >
+              <option value="">All Priorities</option>
+              <option value="Urgent">Urgent</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-gray-400 mb-2 ml-1 uppercase tracking-widest">Requester</label>
+            <SearchableDropdown
+              options={requesters}
+              placeholder="Select..."
+              value={requesterFilter?.id}
+              onSelect={(opt) => {
+                setRequesterFilter(opt);
+                setCurrentPage(1);
+              }}
+              allowClear
+              className="!h-[38px] !rounded-lg !border-gray-200 !bg-white !shadow-none !text-[13px] !font-medium"
+            />
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-gray-400 mb-2 ml-1 uppercase tracking-widest">Project</label>
+            <SearchableDropdown
+              options={projectOptions}
+              placeholder="Select..."
+              value={projectFilter?.id}
+              onSelect={(opt) => {
+                setProjectFilter(opt);
+                setCurrentPage(1);
+              }}
+              allowClear
+              className="!h-[38px] !rounded-lg !border-gray-200 !bg-white !shadow-none !text-[13px] !font-medium"
+            />
+          </div>
         </div>
 
-
         {/* Table */}
-        <div 
+        <div
           data-table-container
-          className="bg-white/70 backdrop-blur-xl backdrop-saturate-150 rounded-3xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.05)] overflow-hidden transition-all duration-200 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.08)] font-outfit"
+          className="bg-white/30 backdrop-blur-xl shadow-sm overflow-hidden transition-all duration-200 font-outfit"
         >
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <colgroup>
-                <col style={{ width: '7%' }} />
-                <col style={{ width: '22%' }} />
-                <col style={{ width: '9%' }} />
-                <col style={{ width: '9%' }} />
-                <col style={{ width: '9%' }} />
-                <col style={{ width: '8%' }} />
-                <col style={{ width: '8%' }} />
-                <col style={{ width: '9%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '9%' }} />
-              </colgroup>
-              <thead className="bg-[#f8fafd] border-b border-gray-100">
-                <tr>
-                  <th className="px-4 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                    ID
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-50/50 border-b border-gray-100">
+                  <th className="px-5 py-4 text-left text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest" style={{ width: '140px' }}>
+                    Issue
                   </th>
-                  <th className="px-4 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                    Title
+                  <th className="px-4 py-4 text-left text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest">
+                    Summary
                   </th>
-                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                    Project
-                  </th>
-                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                    Requester
-                  </th>
-                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                    Assignee
-                  </th>
-                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                    Type
-                  </th>
-                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                    Priority
-                  </th>
-                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                  <th className="px-3 py-4 text-center text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest" style={{ width: '120px' }}>
                     Status
                   </th>
-                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                    Deadline
+                  <th className="px-3 py-4 text-center text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest" style={{ width: '120px' }}>
+                    Priority
                   </th>
-                  <th className="px-4 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                  <th className="px-3 py-4 text-left text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest" style={{ width: '150px' }}>
+                    Reporter
+                  </th>
+                  <th className="px-3 py-4 text-left text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest" style={{ width: '120px' }}>
                     Created
+                  </th>
+                  <th className="px-5 py-4 text-center text-[0.7rem] font-bold text-gray-400 uppercase tracking-widest" style={{ width: '80px' }}>
+                    Action
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-white/20">
                   {paginatedTickets.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
-                        No tickets found matching your filters.
+                      <td colSpan={8} className="px-6 py-20 text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <Icons.Search className="w-10 h-10 text-gray-300" />
+                          <span className="text-gray-500 font-medium">No tickets found matching your filters.</span>
+                        </div>
                       </td>
                     </tr>
                   ) : (
-                    paginatedTickets.map((ticket) => {
-                      const attachmentUrls = ticket.relevantLink
-                        ? ticket.relevantLink.split('\n').filter((url) => url.trim())
-                        : [];
-
-                      return (
-                        <tr
-                          key={ticket.id}
+                    paginatedTickets.map((ticket) => (
+                    <tr
+                      key={ticket.id}
+                      className="group border-b border-gray-50/50 hover:bg-gray-50/80 transition-all duration-200"
+                    >
+                      <td className="px-5 py-4 align-middle">
+                        <div className="flex items-center gap-2.5">
+                          {ticket.type === 'Bug' ? (
+                            <Icons.Bug className="w-4 h-4 text-rose-500" />
+                          ) : (
+                            <Icons.Request className="w-4 h-4 text-blue-500" />
+                          )}
+                          <span className="text-[0.8rem] font-bold text-gray-400 tracking-tight">
+                            {ticket.display_id || (ticket.id.startsWith('HRB-') ? ticket.id : `HRB-${ticket.id}`)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 align-middle">
+                        <span className="text-[0.85rem] font-normal text-gray-700 group-hover:text-blue-600 transition-colors line-clamp-1">
+                          {highlightText(ticket.title, searchFilter)}
+                        </span>
+                      </td>
+                      <td className="px-3 py-4 align-middle text-center">
+                        <div className="flex justify-center">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-medium shadow-sm ${STATUS_COLORS[ticket.status]?.bg || 'bg-gray-50'} ${STATUS_COLORS[ticket.status]?.text || 'text-gray-600'} border border-gray-100`}>
+                            {ticket.status}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-4 align-middle text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <div className={`w-2 h-2 rounded-sm ${
+                            ticket.priority === 'Urgent' ? 'bg-red-500' :
+                            ticket.priority === 'High' ? 'bg-orange-500' :
+                            ticket.priority === 'Medium' ? 'bg-blue-500' :
+                            'bg-gray-400'
+                          }`} />
+                          <span className="text-[0.75rem] font-normal text-gray-600">
+                            {ticket.priority}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-4 align-middle">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-[10px] font-semibold text-blue-600">
+                            {ticket.requestedBy?.charAt(0) || 'U'}
+                          </div>
+                          <span className="text-[0.75rem] font-normal text-gray-600 truncate max-w-[100px]">
+                            {ticket.requestedBy}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-4 align-middle">
+                        <div className="flex items-center gap-1.5 text-gray-400">
+                          <span className="text-[0.75rem] font-normal">
+                            {ticket.created_at ? formatDate(ticket.created_at).relative : '-'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 align-middle text-center">
+                        <button
                           onClick={() => handleTicketClick(ticket)}
-                          className="cursor-pointer hover:bg-gray-50 transition-colors"
+                          className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                         >
-                          <td className="px-3 py-3 text-sm font-medium text-gray-900 break-words">
-                            <div className="flex items-center gap-2">
-                              <span className="break-words">
-                                {ticket.display_id || (ticket.id.startsWith('HRB-') ? ticket.id : `HRB-${ticket.id}`)}
-                              </span>
-                              <button
-                                onClick={(e) => handleCopyToClipboard(ticket, e)}
-                                className={`transition-all p-1 rounded ${
-                                  copiedTicketId === ticket.id
-                                    ? 'text-green-600 bg-green-50'
-                                    : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
-                                }`}
-                                title={copiedTicketId === ticket.id ? 'Copied!' : 'Copy ID - Title'}
-                                type="button"
-                              >
-                                {copiedTicketId === ticket.id ? (
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M5 13l4 4L19 7"
-                                    />
-                                  </svg>
-                                ) : (
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                                    />
-                                  </svg>
-                                )}
-                              </button>
-                            </div>
-                          </td>
-                          <td className="px-3 py-3 text-sm text-gray-900">
-                            <div className="space-y-1">
-                              <div className="font-medium break-words">
-                                {highlightText(ticket.title, searchFilter)}
-                              </div>
-                              {ticket.description && (
-                                <div className="text-xs text-gray-500 line-clamp-2 break-words">
-                                  {ticket.description}
-                                </div>
-                              )}
-                              {attachmentUrls.length > 0 && (
-                                <div className="flex items-center gap-1 flex-wrap">
-                                  {attachmentUrls.map((url, idx) => (
-                                    <a
-                                      key={idx}
-                                      href={url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline"
-                                    >
-                                      <svg
-                                        className="w-3 h-3"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                                        />
-                                      </svg>
-                                      <span className="truncate max-w-[200px]">{url}</span>
-                                    </a>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-3 py-3 text-sm text-gray-600 break-words">
-                            {ticket.projectName || 'N/A'}
-                          </td>
-                          <td className="px-3 py-3 text-sm text-gray-600 break-words">{ticket.requestedBy}</td>
-                          <td className="px-3 py-3 text-sm text-gray-600 break-words">
-                            {ticket.assignee || 'Unassigned'}
-                          </td>
-                          <td className="px-3 py-3 text-sm">
-                            <span
-                              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                                TYPE_COLORS[ticket.type]?.bg || 'bg-gray-100'
-                              } ${TYPE_COLORS[ticket.type]?.text || 'text-gray-700'}`}
-                            >
-                              {ticket.type}
-                            </span>
-                          </td>
-                          <td className="px-3 py-3 text-sm text-gray-600 break-words">{ticket.priority}</td>
-                          <td className="px-4 py-4 text-sm">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 text-[11px] font-bold rounded-full ring-1 ring-inset ${
-                                STATUS_COLORS[ticket.status]?.bg || 'bg-gray-50'
-                              } ${STATUS_COLORS[ticket.status]?.text || 'text-gray-600'} ${
-                                STATUS_COLORS[ticket.status]?.ring || 'ring-gray-600/10'
-                              } uppercase tracking-wider`}
-                            >
-                              {ticket.status}
-                            </span>
-                          </td>
-                          <td className="px-3 py-3 text-sm text-gray-600 break-words">
-                            {(() => {
-                              const { formatted } = formatDate(ticket.due_date || '');
-                              return (
-                                <div className="space-y-0.5">
-                                  <div className="break-words font-medium text-amber-600">{formatted}</div>
-                                </div>
-                              );
-                            })()}
-                          </td>
-                          <td className="px-3 py-3 text-sm text-gray-600 break-words">
-                            {(() => {
-                              const { formatted, relative } = formatDate(ticket.created_at || '');
-                              return (
-                                <div className="space-y-0.5">
-                                  <div className="break-words">{formatted}</div>
-                                  {relative && (
-                                    <div className="text-xs text-gray-400 break-words">{relative}</div>
-                                  )}
-                                </div>
-                              );
-                            })()}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
             </table>
           </div>
-        </div>
 
-        {/* Pagination */}
-        {filteredTickets.length > 0 && (
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-            {/* Left side - Items per page */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-600">Items per page</label>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="px-6 py-5 bg-white/40 border-t border-white/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
                 <select
                   value={ticketsPerPage}
-                  onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-              <div className="text-sm text-gray-600">
-                {startItem} - {endItem} of {filteredTickets.length} items
-              </div>
-            </div>
-
-            {/* Right side - Page navigation */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  setCurrentPage(1);
-                  setPageInput('1');
-                }}
-                disabled={currentPage === 1}
-                className="p-1.5 text-blue-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-blue-50 rounded transition-colors"
-                title="First page"
-                type="button"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                onClick={() => {
-                  const newPage = Math.max(1, currentPage - 1);
-                  setCurrentPage(newPage);
-                  setPageInput(String(newPage));
-                }}
-                disabled={currentPage === 1}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-blue-50 rounded transition-colors"
-                type="button"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                <span>Previous</span>
-              </button>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Page</span>
-                <input
-                  type="text"
-                  value={pageInput}
-                  onChange={(e) => handlePageInputChange(e.target.value)}
-                  onBlur={handlePageInputBlur}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handlePageInputBlur();
-                    }
+                  onChange={(e) => {
+                    handleItemsPerPageChange(Number(e.target.value));
                   }}
-                  className="w-16 px-2 py-1.5 text-sm text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-600">of {totalPages}</span>
+                  className="px-3 py-1.5 text-xs font-bold text-gray-600 bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm cursor-pointer"
+                >
+                  <option value={10}>10 per page</option>
+                  <option value={25}>25 per page</option>
+                  <option value={50}>50 per page</option>
+                  <option value={100}>100 per page</option>
+                </select>
+                <div className="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider">
+                  {startItem}-{endItem} <span className="mx-1">of</span> {filteredTickets.length}
+                </div>
               </div>
-              <button
-                onClick={() => {
-                  const newPage = Math.min(totalPages, currentPage + 1);
-                  setCurrentPage(newPage);
-                  setPageInput(String(newPage));
-                }}
-                disabled={currentPage === totalPages}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-blue-50 rounded transition-colors"
-                type="button"
-              >
-                <span>Next</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-              <button
-                onClick={() => {
-                  setCurrentPage(totalPages);
-                  setPageInput(String(totalPages));
-                }}
-                disabled={currentPage === totalPages}
-                className="p-1.5 text-blue-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-blue-50 rounded transition-colors"
-                title="Last page"
-                type="button"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                </svg>
-              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const newPage = Math.max(1, currentPage - 1);
+                    setCurrentPage(newPage);
+                    setPageInput(String(newPage));
+                  }}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-white/60 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-transparent hover:border-white/60"
+                >
+                  <Icons.ChevronLeft className="w-5 h-5" />
+                </button>
+                
+                <div className="flex items-center gap-2 px-3 py-1 bg-white/50 border border-white/60 rounded-xl shadow-sm">
+                  <input
+                    type="text"
+                    value={pageInput}
+                    onChange={(e) => handlePageInputChange(e.target.value)}
+                    onBlur={handlePageInputBlur}
+                    className="w-8 text-center bg-transparent text-sm font-bold text-blue-600 focus:outline-none"
+                  />
+                  <span className="text-gray-400 text-xs font-bold uppercase tracking-widest border-l border-white/60 pl-2">
+                    of {totalPages}
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => {
+                    const newPage = Math.min(totalPages, currentPage + 1);
+                    setCurrentPage(newPage);
+                    setPageInput(String(newPage));
+                  }}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-white/60 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-transparent hover:border-white/60"
+                >
+                  <Icons.ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <TicketDrawer

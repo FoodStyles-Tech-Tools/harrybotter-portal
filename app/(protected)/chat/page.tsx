@@ -111,7 +111,7 @@ function MarkdownMessage({ text, onAction, disabled, isLatest }: { text: string;
   // Detect raw ticket IDs and convert them to markdown links for ReactMarkdown to handle
   // We do this by replacing HRB-\d+ that are NOT already part of a markdown link
   const processedContent = content.replace(/(?<!\[)HRB-\d+(?!(\]|\]\(.*?\)))/gi, (match) => {
-    return `[${match}](/check-ticket?ticket=${match.toUpperCase()})`;
+    return `[${match}](/tickets?ticket=${match.toUpperCase()})`;
   });
 
   return (
@@ -123,7 +123,7 @@ function MarkdownMessage({ text, onAction, disabled, isLatest }: { text: string;
             a: ({ ...props }) => {
               const url = props.href || "";
               const label = String(props.children || "");
-              const isTicketLink = url.includes("check-ticket") || label.match(/HRB-\d+/i);
+              const isTicketLink = url.includes("tickets") || label.match(/HRB-\d+/i);
               
               return (
                 <a

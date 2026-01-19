@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import AppHeader from '@/components/AppHeader';
+import QuickAddModal from '@/components/QuickAddModal';
 import { getBetterAuthSession, hasBetterAuthSessionCookie } from '@/lib/server-session';
 
 export const runtime = 'nodejs';
@@ -34,7 +35,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
     <div className="min-h-screen">
       <AppHeader userName={userName} userImage={userImage} />
       <main className="w-full">{children}</main>
+      <QuickAddModal />
     </div>
   );
 }
-
