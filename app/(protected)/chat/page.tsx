@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import ChatSidebar from "@/components/ChatSidebar";
 import ReactMarkdown from "react-markdown";
@@ -116,7 +117,7 @@ function MarkdownMessage({ text, onAction, disabled, isLatest }: { text: string;
 
   return (
     <div className="space-y-4">
-      <div className="text-gray-800 leading-relaxed">
+      <div className="text-slate-700 leading-relaxed">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
@@ -130,7 +131,7 @@ function MarkdownMessage({ text, onAction, disabled, isLatest }: { text: string;
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-blue-600 font-bold hover:underline decoration-2 underline-offset-4 decoration-blue-200"
+                  className="inline-flex items-center gap-1.5 text-blue-600 font-semibold hover:underline decoration-2 underline-offset-4 decoration-blue-200/70"
                 >
                   {isTicketLink && <Icons.Ticket className="w-3.5 h-3.5" />}
                   {props.children}
@@ -138,16 +139,16 @@ function MarkdownMessage({ text, onAction, disabled, isLatest }: { text: string;
               );
             },
             // Handle standard markdown elements with custom styling
-            strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
+            strong: ({ children }) => <strong className="font-semibold text-slate-900">{children}</strong>,
             em: ({ children }) => <em className="italic">{children}</em>,
             ul: ({ children }) => <ul className="list-disc pl-5 my-1.5 space-y-0.5">{children}</ul>,
             ol: ({ children }) => <ol className="list-decimal pl-5 my-1.5 space-y-0.5">{children}</ol>,
             li: ({ children }) => <li className="pl-1 leading-normal">{children}</li>,
             p: ({ children }) => <p className="mb-1.5 last:mb-0 leading-relaxed">{children}</p>,
-            h1: ({ children }) => <h1 className="text-2xl font-bold mt-3 mb-2 text-gray-900">{children}</h1>,
-            h2: ({ children }) => <h2 className="text-xl font-bold mt-2.5 mb-1.5 text-gray-900">{children}</h2>,
-            h3: ({ children }) => <h3 className="text-lg font-bold mt-2 mb-1 text-gray-900">{children}</h3>,
-            code: ({ children }) => <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm text-red-600">{children}</code>,
+            h1: ({ children }) => <h1 className="text-2xl font-semibold mt-3 mb-2 text-slate-900">{children}</h1>,
+            h2: ({ children }) => <h2 className="text-xl font-semibold mt-2.5 mb-1.5 text-slate-900">{children}</h2>,
+            h3: ({ children }) => <h3 className="text-lg font-semibold mt-2 mb-1 text-slate-900">{children}</h3>,
+            code: ({ children }) => <code className="bg-blue-50/80 px-1.5 py-0.5 rounded font-mono text-sm text-blue-700">{children}</code>,
             pre: ({ children }) => <pre className="bg-gray-900 text-gray-100 p-3 rounded-xl my-2 overflow-x-auto font-mono text-sm">{children}</pre>,
           }}
         >
@@ -161,7 +162,7 @@ function MarkdownMessage({ text, onAction, disabled, isLatest }: { text: string;
            <button
              onClick={() => onAction("Yes")}
              disabled={disabled}
-             className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-200 hover:bg-blue-700 hover:shadow-lg transition-all active:scale-95 group disabled:opacity-50 disabled:bg-gray-400 disabled:shadow-none disabled:pointer-events-none"
+             className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-sm font-semibold shadow-md shadow-blue-200 hover:bg-blue-700 hover:shadow-lg transition-all active:scale-95 group disabled:opacity-50 disabled:bg-slate-400 disabled:shadow-none disabled:pointer-events-none"
            >
              <Icons.Plus className="w-4 h-4" />
              Create Ticket
@@ -184,11 +185,17 @@ export default function TechToolAssistantPage() {
   const [isSending, setIsSending] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const skipNextHistoryLoad = useRef(false);
 
   // Load messages when session changes
   useEffect(() => {
     if (!currentSessionId) {
       setMessages([]);
+      return;
+    }
+
+    if (skipNextHistoryLoad.current) {
+      skipNextHistoryLoad.current = false;
       return;
     }
 
@@ -275,6 +282,7 @@ export default function TechToolAssistantPage() {
       sessionId = await createNewSession(text);
       if (!sessionId) return;
       setCurrentSessionId(sessionId);
+      skipNextHistoryLoad.current = true;
     }
 
     const userMessage: ChatMessage = {
@@ -372,11 +380,37 @@ export default function TechToolAssistantPage() {
     setMessages([]);
   };
 
+  useEffect(() => {
+    const isEditableTarget = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) return false;
+      const tag = target.tagName;
+      return (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        target.isContentEditable
+      );
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.altKey && event.key.toLowerCase() === "n") {
+        if (isEditableTarget(event.target)) {
+          return;
+        }
+        event.preventDefault();
+        handleNewChat();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Extract first name for greeting
   const firstName = user?.name ? user.name.split(" ")[0] : "User";
 
   return (
-    <div className="flex h-[calc(100vh-4.5rem)] overflow-hidden font-sans">
+    <div className="flex h-[calc(100vh-5rem)] overflow-hidden">
       {/* Sidebar */}
       <ChatSidebar 
         currentSessionId={currentSessionId} 
@@ -385,12 +419,12 @@ export default function TechToolAssistantPage() {
       />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white/10 backdrop-blur-md">
+      <div className="flex-1 flex flex-col min-w-0 bg-transparent">
         <div className="flex-1 overflow-y-auto w-full flex flex-col scrollbar-thin">
           <div className="flex-1 w-full max-w-4xl mx-auto px-6 md:px-12 py-12 flex flex-col">
           {!chatUrl ? (
-            <div className="mt-20 flex flex-col items-center text-center p-12 glass-panel rounded-3xl border-dashed">
-              <p className="text-gray-500 font-medium">
+            <div className="mt-20 flex flex-col items-center text-center p-12 glass-panel rounded-[2rem] border-dashed border-white/50">
+              <p className="text-slate-500 font-medium">
                 Assistant configuration missing. Please contact support.
               </p>
             </div>
@@ -398,36 +432,37 @@ export default function TechToolAssistantPage() {
             // Empty State / Greeting
             <div className="flex-1 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-700">
               <div className="space-y-6">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-blue-600 text-white shadow-[0_12px_40px_rgba(37,99,235,0.3)] mb-4 animate-bounce-slow">
-                  <Icons.Sparkles className="w-10 h-10" />
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-[1.75rem] bg-white/80 shadow-[0_18px_50px_rgba(37,99,235,0.25)] mb-4 overflow-hidden animate-bounce-slow">
+                  <Image
+                    src="/wizard-bot.jpg"
+                    alt="Wizard bot"
+                    width={80}
+                    height={80}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-                <h1 className="text-5xl md:text-7xl font-semibold text-gray-900 tracking-tight">
+                <h1 className="text-5xl md:text-7xl font-semibold text-slate-900 tracking-tight">
                   Hello, <span className="text-blue-600">{firstName}</span>
                 </h1>
-                <p className="text-2xl md:text-3xl text-gray-400 font-medium tracking-tight max-w-2xl mx-auto leading-tight">
-                  I'm your TechTool Assistant. <br/>
-                  <span className="text-gray-300">How can I help you build today?</span>
+                <p className="text-xl md:text-2xl text-slate-400 font-medium tracking-tight max-w-2xl mx-auto leading-tight">
+                  I'm your TechTool Assistant.
                 </p>
                 
-                <div className="grid grid-cols-2 gap-4 mt-12 opacity-80">
-                  <button onClick={() => setInputValue("How do I create a new ticket?")} className="glass-button p-4 rounded-2xl text-left hover:border-blue-200 transition-all">
-                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">Guide</p>
-                    <p className="text-sm font-semibold text-gray-700">How do I create a ticket?</p>
-                  </button>
-                  <button onClick={() => setInputValue("What is the status of my tickets?")} className="glass-button p-4 rounded-2xl text-left hover:border-blue-200 transition-all">
-                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">Status</p>
-                    <p className="text-sm font-semibold text-gray-700">Check my ticket status</p>
-                  </button>
-                </div>
               </div>
             </div>
           ) : isLoadingMessages ? (
             <div className="flex items-center justify-center h-full">
               <div className="flex flex-col items-center gap-6">
-                <div className="w-16 h-16 rounded-3xl bg-blue-50 flex items-center justify-center animate-spin-slow">
-                  <Icons.Sparkles className="w-8 h-8 text-blue-500" />
+                <div className="w-16 h-16 rounded-3xl bg-white/80 flex items-center justify-center animate-spin-slow overflow-hidden">
+                  <Image
+                    src="/wizard-bot.jpg"
+                    alt="Wizard bot"
+                    width={64}
+                    height={64}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider animate-pulse">Synchronizing history</p>
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] animate-pulse">Synchronizing history</p>
               </div>
             </div>
           ) : (
@@ -441,8 +476,14 @@ export default function TechToolAssistantPage() {
                 >
                   {/* Bot Avatar */}
                   {message.sender === "bot" && (
-                    <div className="w-12 h-12 rounded-2xl overflow-hidden flex-shrink-0 mt-1 shadow-lg border-2 border-white bg-blue-50 flex items-center justify-center">
-                       <Icons.Sparkles className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 rounded-2xl overflow-hidden flex-shrink-0 mt-1 shadow-lg border border-white/70 bg-white/80 flex items-center justify-center">
+                      <Image
+                        src="/wizard-bot.jpg"
+                        alt="Wizard bot"
+                        width={48}
+                        height={48}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
                   )}
 
@@ -450,8 +491,8 @@ export default function TechToolAssistantPage() {
                     <div
                       className={`px-6 py-4 text-[0.95rem] leading-relaxed shadow-sm transition-all duration-300 ${
                         message.sender === "user"
-                          ? "bg-blue-600 text-white rounded-3xl rounded-tr-sm shadow-[0_4px_15px_rgba(37,99,235,0.2)]"
-                          : "glass-panel text-gray-800 rounded-3xl rounded-tl-sm"
+                          ? "bg-blue-600/95 text-white rounded-[2rem] rounded-tr-md shadow-[0_12px_30px_rgba(37,99,235,0.25)]"
+                          : "glass-panel text-slate-700 rounded-[2rem] rounded-tl-md"
                       }`}
                     >
                       {message.sender === "bot" ? (
@@ -489,10 +530,16 @@ export default function TechToolAssistantPage() {
               {/* Loading Indicator */}
               {isSending && (
                 <div className="flex gap-6 animate-in fade-in slide-in-from-bottom-2">
-                   <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shadow-md animate-pulse">
-                       <Icons.Sparkles className="w-6 h-6 text-blue-600" />
+                   <div className="w-12 h-12 rounded-2xl overflow-hidden bg-white/80 flex items-center justify-center shadow-md animate-pulse">
+                      <Image
+                        src="/wizard-bot.jpg"
+                        alt="Wizard bot"
+                        width={48}
+                        height={48}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
-                    <div className="glass-panel px-6 py-5 rounded-3xl rounded-tl-sm">
+                    <div className="glass-panel px-6 py-5 rounded-[2rem] rounded-tl-md">
                       <div className="flex gap-1.5">
                         <span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                         <span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
@@ -512,14 +559,14 @@ export default function TechToolAssistantPage() {
         <div className="pb-10 w-full flex-shrink-0">
           <div className="max-w-4xl mx-auto px-6 md:px-12 w-full">
             {currentTicketId ? (
-              <div className="flex items-center justify-between gap-4 glass-panel rounded-2xl px-6 py-4 mb-2 border-blue-100/50">
+              <div className="flex items-center justify-between gap-4 glass-panel rounded-2xl px-6 py-4 mb-2 border-blue-200/50">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/20">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/25">
                     <Icons.Ticket className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Ticket Created</p>
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em]">Ticket Created</p>
+                    <p className="text-sm font-semibold text-slate-900">
                       ID: <span className="text-blue-600">{currentTicketId}</span>
                     </p>
                   </div>
@@ -533,13 +580,10 @@ export default function TechToolAssistantPage() {
               </div>
             ) : (
               <div 
-                className={`flex items-center gap-4 glass-panel rounded-3xl px-5 py-4 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)] focus-within:shadow-[0_20px_60px_-15px_rgba(37,99,235,0.1)] focus-within:border-blue-400/30 transition-all duration-500 ${
+                className={`flex items-center gap-4 glass-panel rounded-[2rem] px-5 py-4 shadow-[0_18px_50px_-28px_rgba(37,99,235,0.25)] focus-within:shadow-[0_22px_60px_-24px_rgba(37,99,235,0.25)] focus-within:border-blue-400/50 transition-all duration-500 ${
                   !chatUrl ? "opacity-50 pointer-events-none" : ""
                 }`}
               >
-                <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
-                  <Icons.Plus className="w-5 h-5" />
-                </div>
                 <input
                   value={inputValue}
                   onChange={(event) => setInputValue(event.target.value)}
@@ -549,8 +593,8 @@ export default function TechToolAssistantPage() {
                       handleSend();
                     }
                   }}
-                  placeholder="Ask anything or describe your issue..."
-                  className="flex-1 bg-transparent border-none outline-none text-gray-900 text-[15px] font-medium placeholder-gray-400 py-1"
+                  placeholder="Describe what you need us to help"
+                  className="flex-1 bg-transparent border-none outline-none text-slate-900 text-[15px] font-normal placeholder-slate-400 py-1"
                   disabled={isSending || !chatUrl || !user}
                 />
                 
@@ -560,8 +604,8 @@ export default function TechToolAssistantPage() {
                   disabled={!canSend || isSending}
                   className={`p-3 rounded-2xl transition-all duration-300 ${
                     inputValue.trim().length > 0 
-                     ? "bg-blue-600 text-white hover:bg-blue-700 shadow-[0_8px_20px_rgba(37,99,235,0.25)] hover:scale-105" 
-                     : "bg-gray-50 text-gray-300"
+                     ? "bg-blue-600 text-white hover:bg-blue-700 shadow-[0_12px_26px_rgba(37,99,235,0.25)] hover:scale-105" 
+                     : "bg-white/70 text-slate-300"
                   }`}
                 >
                   <Icons.Send className="w-5 h-5" />
@@ -570,8 +614,8 @@ export default function TechToolAssistantPage() {
             )}
             
             <div className="text-center mt-4">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider opacity-60">
-                TechTool AI Assistant &bull; Always check critical info
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] opacity-60">
+                TechTool AI Assistant may made a mistake, please check all critical info
               </p>
             </div>
           </div>
@@ -580,4 +624,3 @@ export default function TechToolAssistantPage() {
     </div>
   );
 }
-

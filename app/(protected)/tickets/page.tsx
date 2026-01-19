@@ -25,8 +25,8 @@ export default function CheckTicketPage() {
   }, [searchParams]);
 
   return (
-    <div className="flex-1 w-full flex flex-col font-sans">
-      <div className="flex-1 bg-white/5 backdrop-blur-md overflow-hidden">
+    <div className="flex-1 w-full flex flex-col">
+      <div className="flex-1 bg-white/10 backdrop-blur-md overflow-hidden">
         <TicketList 
           initialTicketIdFilter={initialTicketId} 
           initialRequesterName={requesterName}

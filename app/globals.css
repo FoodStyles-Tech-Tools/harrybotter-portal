@@ -3,42 +3,65 @@
 @tailwind utilities;
 
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.45);
-  --glass-bg-hover: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-blur: blur(12px);
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.75);
+  --glass-bg-hover: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(148, 198, 255, 0.35);
+  --glass-border-strong: rgba(120, 178, 255, 0.45);
+  --glass-blur: blur(22px);
   --primary-blue: #2563eb;
   --secondary-blue: #3b82f6;
+  --ice-blue: #e9f2ff;
 }
 
 @layer base {
   body {
-    @apply text-gray-900 antialiased min-h-screen selection:bg-blue-100 font-sans;
+    @apply text-slate-900 antialiased min-h-screen selection:bg-blue-100 font-sans;
+    font-weight: 300;
     font-feature-settings: "cv02", "cv03", "cv04", "ss01";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: 
-      radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.6) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(191, 219, 254, 0.4) 0px, transparent 50%),
-      radial-gradient(at 50% 50%, rgba(255, 255, 255, 0.9) 0px, transparent 100%),
-      radial-gradient(at 100% 100%, rgba(219, 234, 254, 0.5) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(186, 230, 253, 0.4) 0px, transparent 50%);
+    background:
+      radial-gradient(1200px 700px at 8% -10%, rgba(59, 130, 246, 0.18), transparent 60%),
+      radial-gradient(900px 600px at 92% -5%, rgba(147, 197, 253, 0.18), transparent 55%),
+      radial-gradient(700px 500px at 20% 110%, rgba(191, 219, 254, 0.18), transparent 60%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(233, 242, 255, 0.9) 65%, rgba(245, 250, 255, 1) 100%);
     background-attachment: fixed;
-    background-color: #f8fafc;
+    background-color: #f4f8ff;
   }
 }
 
 @layer components {
   .glass-panel {
-    @apply bg-white/45 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.05)];
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 30px 80px -60px rgba(37, 99, 235, 0.35), 0 12px 32px -24px rgba(15, 23, 42, 0.2);
   }
   
   .glass-button {
-    @apply bg-white/40 backdrop-blur-md border border-white/30 hover:bg-white/60 transition-all duration-300;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(148, 198, 255, 0.35);
+    backdrop-filter: blur(16px) saturate(130%);
+    transition: all 0.3s ease;
   }
 
   .glass-input {
-    @apply bg-white/30 backdrop-blur-sm border border-white/20 focus:bg-white/50 focus:border-blue-400/50 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300;
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(148, 198, 255, 0.3);
+    backdrop-filter: blur(14px) saturate(140%);
+    transition: all 0.3s ease;
+  }
+
+  .glass-button:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-strong);
+  }
+
+  .glass-input:focus {
+    background: var(--glass-bg-strong);
+    border-color: rgba(59, 130, 246, 0.45);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+    outline: none;
   }
 }
 

@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 
 interface AppHeaderProps {
@@ -51,6 +52,16 @@ const Icons = {
 
 export default function AppHeader({ userName, userImage }: AppHeaderProps) {
   const pathname = usePathname();
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [userImageError, setUserImageError] = useState(false);
+
+  useEffect(() => {
+    if (!isShortcutsOpen) return;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isShortcutsOpen]);
 
   const handleLogout = async () => {
     try {
@@ -76,26 +87,26 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
     : '?';
 
   return (
-    <header className="sticky top-0 z-40 glass-panel border-b border-white/20 transition-all duration-300">
-      <div className="w-full px-8 py-3.5 flex items-center justify-between">
+    <header className="sticky top-0 z-40 glass-panel border-b border-white/30">
+      <div className="w-full px-6 md:px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-10">
           {/* Main Title / Brand */}
           <Link href="/chat" className="flex items-center gap-3 group">
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]">
+            <div className="flex items-center justify-center w-10 h-10 rounded-2xl bg-blue-600 text-white shadow-[0_10px_25px_rgba(37,99,235,0.25)] transition-transform duration-300 group-hover:scale-105">
               <Icons.Sparkles className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
-              <span className="text-lg font-semibold text-gray-900 tracking-tight leading-none group-hover:text-blue-600 transition-colors">
+              <span className="text-lg font-semibold text-slate-900 tracking-tight leading-none group-hover:text-blue-600 transition-colors">
                 HarryBotter
               </span>
-              <span className="text-[10px] font-bold text-blue-500/70 uppercase tracking-wider mt-0.5">
+              <span className="text-[10px] font-semibold text-blue-500/70 uppercase tracking-[0.2em] mt-0.5">
                 Portal
               </span>
             </div>
           </Link>
 
           {/* Navigation */}
-          <nav className="hidden lg:flex items-center gap-1 bg-white/30 p-1 rounded-2xl border border-white/20">
+          <nav className="hidden lg:flex items-center gap-1 bg-white/50 p-1.5 rounded-2xl border border-white/40">
             {navItems.map((item) => {
               const isActive =
                 pathname === item.href ||
@@ -107,43 +118,43 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
                   href={item.href}
                   className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-medium transition-all duration-300 ${
                     isActive
-                      ? 'bg-white text-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.05)] scale-[1.01]'
-                      : 'text-gray-500 hover:text-gray-900 hover:bg-white/40'
+                      ? 'bg-white/80 text-blue-600 shadow-[0_6px_16px_rgba(37,99,235,0.12)] scale-[1.01]'
+                      : 'text-slate-500 hover:text-slate-900 hover:bg-white/60'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
                   {item.label}
                 </Link>
               );
             })}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-quick-add'))}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-medium transition-all duration-300 text-slate-500 hover:text-slate-900 hover:bg-white/60"
+            >
+              <Icons.Plus className="w-4 h-4 text-slate-400" strokeWidth={2} />
+              Create
+            </button>
           </nav>
-
-          <button
-            onClick={() => window.dispatchEvent(new CustomEvent('open-quick-add'))}
-            className="flex items-center gap-2 px-5 py-2 rounded-xl text-[11px] font-semibold bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)] hover:bg-blue-700 hover:scale-[1.01] active:scale-95 transition-all uppercase tracking-wider"
-          >
-            <Icons.Plus className="w-4 h-4" strokeWidth={3} />
-            Create
-          </button>
         </div>
 
         {/* User Profile */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-4 pl-6 border-l border-gray-200/30">
+          <div className="flex items-center gap-4 pl-6 border-l border-white/40">
             <div className="text-right hidden sm:block">
-              <p className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-0.5">Account</p>
-              <p className="text-sm font-medium text-gray-900 truncate max-w-[150px]">{userName ?? 'User'}</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-semibold mb-0.5">Account</p>
+              <p className="text-sm font-medium text-slate-900 truncate max-w-[150px]">{userName ?? 'User'}</p>
             </div>
             
-            {userImage ? (
+            {userImage && !userImageError ? (
               <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity blur-sm" />
+                <div className="absolute -inset-0.5 bg-blue-400/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity blur-sm" />
                 <Image
                   src={userImage}
                   alt={userName ?? 'User avatar'}
                   width={40}
                   height={40}
-                  className="relative rounded-full object-cover ring-2 ring-white shadow-sm"
+                  className="relative rounded-full object-cover ring-2 ring-white/80 shadow-sm"
+                  onError={() => setUserImageError(true)}
                 />
               </div>
             ) : (
@@ -154,8 +165,20 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
             
             <button
               type="button"
+              onClick={() => setIsShortcutsOpen(true)}
+              className="p-2.5 rounded-xl glass-button text-slate-400 hover:text-blue-600 transition-all"
+              title="Keyboard shortcuts"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2" />
+                <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h12" />
+              </svg>
+            </button>
+
+            <button
+              type="button"
               onClick={handleLogout}
-              className="ml-2 p-2.5 rounded-xl glass-button text-gray-400 hover:text-rose-500 hover:bg-rose-50/50 hover:border-rose-100 transition-all group"
+              className="ml-2 p-2.5 rounded-xl glass-button text-slate-400 hover:text-rose-500 hover:bg-white/70 hover:border-rose-200 transition-all group"
               title="Logout"
             >
               <Icons.Logout className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
@@ -163,6 +186,51 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
           </div>
         </div>
       </div>
+
+      {isShortcutsOpen && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center px-4">
+          <div
+            className="absolute inset-0 bg-blue-900/30"
+            onClick={() => setIsShortcutsOpen(false)}
+          />
+          <div className="relative w-full max-w-md glass-panel bg-white rounded-[1.75rem] border border-white/70 shadow-[0_24px_80px_-50px_rgba(37,99,235,0.45)] overflow-hidden">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-white/60">
+              <span className="text-[10px] uppercase tracking-[0.25em] text-slate-400">
+                Keyboard Shortcuts
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsShortcutsOpen(false)}
+                className="ml-auto text-slate-400 hover:text-slate-700"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="px-5 py-5 space-y-3 text-[12px] text-slate-600 font-light">
+              <div className="flex items-center justify-between">
+                <span>New chat (Chat page)</span>
+                <div className="flex items-center gap-1">
+                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">Alt</kbd>
+                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">N</kbd>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>New chat (Mac)</span>
+                <div className="flex items-center gap-1">
+                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">⌥</kbd>
+                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">N</kbd>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Search tickets</span>
+                <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">/</kbd>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

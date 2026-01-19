@@ -22,7 +22,16 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: [
+          '"SF Pro Display"',
+          '"SF Pro Text"',
+          '"SF Pro Icons"',
+          '"Apple SD Gothic Neo"',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'sans-serif',
+        ],
       },
     },
   },

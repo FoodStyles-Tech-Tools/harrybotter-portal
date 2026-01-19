@@ -20,8 +20,8 @@ function AllTicketsRedirect() {
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-gray-600 font-outfit">Redirecting...</p>
+      <div className="text-center glass-panel rounded-2xl px-6 py-4 border border-white/60">
+        <p className="text-slate-500">Redirecting...</p>
       </div>
     </div>
   );
@@ -31,9 +31,9 @@ export default function AllTicketsPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-gray-600">Loading...</p>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center glass-panel rounded-2xl px-6 py-4 border border-white/60">
+            <p className="text-slate-500">Loading...</p>
           </div>
         </div>
       }

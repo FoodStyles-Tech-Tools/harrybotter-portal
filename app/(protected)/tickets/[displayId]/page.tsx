@@ -57,7 +57,7 @@ function TicketPageContent() {
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading ticket...</p>
+          <p className="text-slate-500">Loading ticket...</p>
         </div>
       </div>
     );
@@ -70,7 +70,7 @@ function TicketPageContent() {
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={() => router.push('/check-ticket')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700"
           >
             Go to Check Ticket
           </button>
@@ -89,12 +89,12 @@ function TicketPageContent() {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">
+          <p className="text-slate-600 mb-4">
             Ticket <strong>{displayId.toUpperCase()}</strong> not found.
           </p>
           <button
             onClick={() => router.push('/check-ticket')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700"
           >
             Go to Check Ticket
           </button>
@@ -104,9 +104,9 @@ function TicketPageContent() {
   }
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className="w-full glass-panel rounded-[2rem] shadow-sm border border-white/60 p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Ticket Overview</h2>
+        <h2 className="text-xl font-semibold text-slate-900 mb-2">Ticket Overview</h2>
       </div>
       <TicketList initialTickets={tickets} initialProjects={projects} initialTicketIdFilter={displayId} />
     </div>
@@ -117,10 +117,10 @@ export default function TicketPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center glass-panel rounded-2xl px-6 py-4 border border-white/60">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
+            <p className="text-slate-500">Loading...</p>
           </div>
         </div>
       }

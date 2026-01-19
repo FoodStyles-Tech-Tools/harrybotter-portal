@@ -73,8 +73,8 @@ export default function SubmitTicketPage() {
 
   return (
     <>
-      <div className="flex-1 w-full px-4 md:px-6 py-6 flex flex-col font-outfit">
-        <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-1 md:p-2 border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]">
+      <div className="flex-1 w-full px-4 md:px-10 py-8 flex flex-col">
+        <div className="glass-panel rounded-[2rem] p-1 md:p-2 border border-white/60 shadow-[0_20px_60px_-40px_rgba(37,99,235,0.35)]">
           <TicketForm
             onSubmit={handleTicketSubmit}
             currentUser={currentUser}

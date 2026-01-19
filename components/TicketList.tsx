@@ -4,17 +4,16 @@ import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import useSWR from 'swr';
 import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
-import TicketDrawer from './TicketDrawer';
 import type { Ticket, Project } from '@/types';
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; ring: string }> = {
   Open: { bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'ring-emerald-600/10' },
-  'In Progress': { bg: 'bg-amber-50', text: 'text-amber-700', ring: 'ring-amber-600/10' },
-  Completed: { bg: 'bg-blue-50', text: 'text-blue-700', ring: 'ring-blue-600/10' },
-  Cancelled: { bg: 'bg-gray-50', text: 'text-gray-600', ring: 'ring-gray-600/10' },
+  'In Progress': { bg: 'bg-blue-50', text: 'text-blue-700', ring: 'ring-blue-600/10' },
+  Completed: { bg: 'bg-sky-50', text: 'text-sky-700', ring: 'ring-sky-600/10' },
+  Cancelled: { bg: 'bg-slate-50', text: 'text-slate-600', ring: 'ring-slate-600/10' },
   Rejected: { bg: 'bg-rose-50', text: 'text-rose-700', ring: 'ring-rose-600/10' },
   'On Hold': { bg: 'bg-slate-50', text: 'text-slate-700', ring: 'ring-slate-600/10' },
-  Blocked: { bg: 'bg-orange-50', text: 'text-orange-700', ring: 'ring-orange-600/10' },
+  Blocked: { bg: 'bg-slate-50', text: 'text-slate-700', ring: 'ring-slate-600/10' },
 };
 
 const Icons = {
@@ -89,9 +88,8 @@ export default function TicketList({
     }
   );
 
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [copiedTicketId, setCopiedTicketId] = useState<string | null>(null);
+  const [failedReporterAvatars, setFailedReporterAvatars] = useState<Record<string, boolean>>({});
 
   // Filters
   const [ticketIdFilter, setTicketIdFilter] = useState(initialTicketIdFilter || '');
@@ -160,11 +158,14 @@ export default function TicketList({
       if (typeFilter && ticket.type !== typeFilter) return false;
 
       // Priority filter
-      if (priorityFilter && ticket.priority !== priorityFilter) return false;
+      if (priorityFilter) {
+        const ticketPriority = String(ticket.priority || '').toLowerCase();
+        if (ticketPriority !== priorityFilter.toLowerCase()) return false;
+      }
 
       return true;
     });
-  }, [tickets, ticketIdFilter, searchFilter, requesterFilter, projectFilter, statusFilter, typeFilter]);
+  }, [tickets, ticketIdFilter, searchFilter, requesterFilter, projectFilter, statusFilter, typeFilter, priorityFilter]);
 
   const totalPages = Math.ceil(filteredTickets.length / ticketsPerPage);
   const paginatedTickets = filteredTickets.slice(
@@ -208,10 +209,6 @@ export default function TicketList({
     setPageInput('1');
   };
 
-  const handleTicketClick = (ticket: Ticket) => {
-    setSelectedTicket(ticket);
-    setIsDrawerOpen(true);
-  };
 
   const handleCopyToClipboard = async (ticket: Ticket, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click
@@ -237,12 +234,13 @@ export default function TicketList({
     }
   }, [currentPage]);
 
+
   const highlightText = (text: string, search: string) => {
     if (!search) return text;
     const parts = text.split(new RegExp(`(${search})`, 'gi'));
     return parts.map((part, i) =>
       part.toLowerCase() === search.toLowerCase() ? (
-        <mark key={i} className="bg-yellow-200">
+        <mark key={i} className="bg-blue-100/80">
           {part}
         </mark>
       ) : (
@@ -324,7 +322,7 @@ export default function TicketList({
       {/* Filters Area */}
       <div className="glass-panel p-6 rounded-3xl grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 relative z-30">
         <div className="space-y-2">
-          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider ml-1">Search ID</label>
+          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] ml-1">Search ID</label>
           <input
             type="text"
             value={ticketIdFilter}
@@ -333,11 +331,11 @@ export default function TicketList({
               setCurrentPage(1);
             }}
             placeholder="HRB-..."
-            className="w-full h-11 px-4 text-sm glass-input rounded-xl font-medium placeholder:text-gray-300"
+            className="w-full h-11 px-4 text-sm glass-input rounded-xl font-normal placeholder:text-slate-300"
           />
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider ml-1">Summary</label>
+          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] ml-1">Summary</label>
           <input
             type="text"
             value={searchFilter}
@@ -346,11 +344,11 @@ export default function TicketList({
               setCurrentPage(1);
             }}
             placeholder="Search titles..."
-            className="w-full h-11 px-4 text-sm glass-input rounded-xl font-medium placeholder:text-gray-300"
+            className="w-full h-11 px-4 text-sm glass-input rounded-xl font-normal placeholder:text-slate-300"
           />
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider ml-1">Status</label>
+          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] ml-1">Status</label>
           <SearchableDropdown
             options={Object.keys(STATUS_COLORS).map(s => ({ id: s, name: s }))}
             placeholder="All Statuses"
@@ -363,7 +361,7 @@ export default function TicketList({
           />
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider ml-1">Priority</label>
+          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] ml-1">Priority</label>
           <SearchableDropdown
             options={['Urgent', 'High', 'Medium', 'Low'].map(p => ({ id: p, name: p }))}
             placeholder="All Priorities"
@@ -376,7 +374,7 @@ export default function TicketList({
           />
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider ml-1">Reporter</label>
+          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] ml-1">Reporter</label>
           <SearchableDropdown
             options={requesters}
             placeholder="Select..."
@@ -389,7 +387,7 @@ export default function TicketList({
           />
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider ml-1">Project</label>
+          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] ml-1">Project</label>
           <SearchableDropdown
             options={projectOptions}
             placeholder="Select..."
@@ -412,12 +410,12 @@ export default function TicketList({
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-white/30 border-b border-white/20">
-                <th className="pl-8 pr-4 py-6 text-left text-[10px] font-medium text-gray-400 uppercase tracking-wider" style={{ width: '150px' }}>Issue ID</th>
-                <th className="px-4 py-6 text-left text-[10px] font-medium text-gray-400 uppercase tracking-wider">Summary</th>
-                <th className="px-4 py-6 text-center text-[10px] font-medium text-gray-400 uppercase tracking-wider" style={{ width: '130px' }}>Status</th>
-                <th className="px-4 py-6 text-center text-[10px] font-medium text-gray-400 uppercase tracking-wider" style={{ width: '130px' }}>Priority</th>
-                <th className="px-4 py-6 text-left text-[10px] font-medium text-gray-400 uppercase tracking-wider" style={{ width: '180px' }}>Reporter</th>
-                <th className="pr-8 px-4 py-6 text-left text-[10px] font-medium text-gray-400 uppercase tracking-wider" style={{ width: '150px' }}>Created</th>
+                <th className="pl-8 pr-4 py-6 text-left text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]" style={{ width: '150px' }}>Issue ID</th>
+                <th className="px-4 py-6 text-left text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Summary</th>
+                <th className="px-4 py-6 text-center text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]" style={{ width: '130px' }}>Status</th>
+                <th className="px-4 py-6 text-center text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]" style={{ width: '130px' }}>Priority</th>
+                <th className="px-4 py-6 text-left text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]" style={{ width: '180px' }}>Reporter</th>
+                <th className="pr-8 px-4 py-6 text-left text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]" style={{ width: '150px' }}>Created</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10">
@@ -425,10 +423,10 @@ export default function TicketList({
                   <tr>
                     <td colSpan={6} className="px-6 py-32 text-center">
                        <div className="flex flex-col items-center gap-4">
-                          <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center animate-spin-slow">
+                          <div className="w-12 h-12 rounded-2xl bg-blue-100/60 flex items-center justify-center animate-spin-slow">
                             <Icons.Plus className="w-6 h-6 text-blue-600" />
                           </div>
-                          <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider animate-pulse">Fetching records</p>
+                          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] animate-pulse">Fetching records</p>
                        </div>
                     </td>
                   </tr>
@@ -436,11 +434,11 @@ export default function TicketList({
                   <tr>
                     <td colSpan={6} className="px-6 py-32 text-center">
                       <div className="flex flex-col items-center gap-3">
-                        <div className="w-16 h-16 rounded-3xl bg-gray-50 flex items-center justify-center mb-2">
-                          <Icons.Search className="w-8 h-8 text-gray-300" />
+                        <div className="w-16 h-16 rounded-3xl bg-slate-50 flex items-center justify-center mb-2">
+                          <Icons.Search className="w-8 h-8 text-slate-300" />
                         </div>
-                        <p className="text-gray-900 font-medium">No tickets found</p>
-                        <p className="text-sm text-gray-400">Try adjusting your search or filters.</p>
+                        <p className="text-slate-900 font-medium">No tickets found</p>
+                        <p className="text-sm text-slate-400">Try adjusting your search or filters.</p>
                       </div>
                     </td>
                   </tr>
@@ -448,26 +446,25 @@ export default function TicketList({
                   paginatedTickets.map((ticket) => (
                     <tr
                       key={ticket.id}
-                      onClick={() => handleTicketClick(ticket)}
-                      className="group hover:bg-white/40 transition-all duration-300 cursor-pointer"
+                      className="group hover:bg-white/40 transition-all duration-300"
                     >
                       <td className="pl-8 pr-4 py-5 align-middle">
                         <div className="flex items-center gap-3">
                           <div className={`p-2 rounded-lg ${ticket.type === 'Bug' ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'}`}>
                             {ticket.type === 'Bug' ? <Icons.Bug className="w-4 h-4" /> : <Icons.Request className="w-4 h-4" />}
                           </div>
-                          <span className="text-sm font-medium text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors">
+                          <span className="text-sm font-light text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
                             {ticket.display_id || (ticket.id.startsWith('HRB-') ? ticket.id : `HRB-${ticket.id}`)}
                           </span>
                         </div>
                       </td>
                       <td className="px-4 py-5 align-middle">
-                        <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors line-clamp-1">
+                        <p className="text-sm font-light text-slate-700 group-hover:text-slate-900 transition-colors line-clamp-1">
                           {highlightText(ticket.title, searchFilter)}
                         </p>
                       </td>
                       <td className="px-4 py-5 align-middle text-center">
-                        <span className={`inline-flex px-3 py-1 rounded-lg text-[10px] font-medium uppercase tracking-wider ${STATUS_COLORS[ticket.status]?.bg || 'bg-gray-50'} ${STATUS_COLORS[ticket.status]?.text || 'text-gray-600'} border border-white/20 shadow-sm`}>
+                        <span className={`inline-flex px-3 py-1 rounded-lg text-xs font-light ${STATUS_COLORS[ticket.status]?.bg || 'bg-slate-50'} ${STATUS_COLORS[ticket.status]?.text || 'text-slate-600'} border border-white/20 shadow-sm`}>
                           {ticket.status}
                         </span>
                       </td>
@@ -475,42 +472,46 @@ export default function TicketList({
                         <div className="flex items-center justify-center gap-2">
                           <div className={`w-2 h-2 rounded-full ${
                             ticket.priority === 'Urgent' ? 'bg-rose-500 animate-pulse' :
-                            ticket.priority === 'High' ? 'bg-indigo-600/70' :
+                            ticket.priority === 'High' ? 'bg-blue-600' :
                             ticket.priority === 'Medium' ? 'bg-blue-500' :
-                            'bg-gray-300'
+                            'bg-slate-300'
                           }`} />
-                          <span className="text-[11px] font-medium text-gray-600 uppercase tracking-wider">
+                          <span className="text-xs font-light text-slate-600">
                             {ticket.priority}
                           </span>
                         </div>
                       </td>
                       <td className="px-4 py-5 align-middle">
                         <div className="flex items-center gap-3">
-                          {ticket.reporterAvatar ? (
-                             <div className="relative w-8 h-8 flex-shrink-0">
-                                <Image
-                                  src={ticket.reporterAvatar}
-                                  alt={ticket.requestedBy}
-                                  width={32}
-                                  height={32}
-                                  unoptimized
-                                  className="rounded-full object-cover ring-2 ring-white/10 shadow-sm"
-                                />
-                             </div>
+                          {ticket.reporterAvatar && !failedReporterAvatars[ticket.id] ? (
+                            <div className="relative w-8 h-8 flex-shrink-0">
+                              <Image
+                                src={ticket.reporterAvatar}
+                                alt={ticket.requestedBy}
+                                width={32}
+                                height={32}
+                                unoptimized
+                                className="rounded-full object-cover ring-2 ring-white/10 shadow-sm"
+                                onError={() => {
+                                  const key = ticket.id;
+                                  setFailedReporterAvatars((prev) => ({ ...prev, [key]: true }));
+                                }}
+                              />
+                            </div>
                           ) : (
                             <div className="w-8 h-8 rounded-full glass-button flex items-center justify-center text-[10px] font-medium text-blue-600 shadow-sm">
                               {ticket.requestedBy?.charAt(0) || 'U'}
                             </div>
                           )}
-                          <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">
+                          <span className="text-sm font-light text-slate-700 truncate max-w-[120px]">
                             {ticket.requestedBy}
                           </span>
                         </div>
                       </td>
                       <td className="pr-8 px-4 py-5 align-middle">
                         <div className="flex flex-col text-left">
-                          <p className="text-xs font-medium text-gray-900">{formatDate(ticket.created_at || '').formatted}</p>
-                          <p className="text-[10px] font-normal text-gray-400 tracking-wider uppercase">{formatDate(ticket.created_at || '').relative}</p>
+                          <p className="text-xs font-light text-slate-900">{formatDate(ticket.created_at || '').formatted}</p>
+                          <p className="text-[10px] font-light text-slate-400">{formatDate(ticket.created_at || '').relative}</p>
                         </div>
                       </td>
                     </tr>
@@ -527,14 +528,14 @@ export default function TicketList({
               <select
                 value={ticketsPerPage}
                 onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                className="h-10 px-4 text-xs font-medium text-gray-600 glass-button rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 cursor-pointer"
+                className="h-10 px-4 text-xs font-medium text-slate-600 glass-button rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 cursor-pointer"
               >
                 <option value={10}>10 View</option>
                 <option value={25}>25 View</option>
                 <option value={50}>50 View</option>
                 <option value={100}>100 View</option>
               </select>
-              <div className="text-[10px] font-medium text-gray-400 uppercase tracking-wider border-l border-white/40 pl-4 h-5 flex items-center">
+              <div className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] border-l border-white/40 pl-4 h-5 flex items-center">
                 Displaying {startItem}-{endItem} <span className="mx-1 opacity-40">/</span> {filteredTickets.length}
               </div>
             </div>
@@ -547,7 +548,7 @@ export default function TicketList({
                   setPageInput(String(newPage));
                 }}
                 disabled={currentPage === 1}
-                className="p-2.5 glass-button rounded-xl text-gray-400 hover:text-blue-600 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                className="p-2.5 glass-button rounded-xl text-slate-400 hover:text-blue-600 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
               >
                 <Icons.ChevronLeft className="w-5 h-5" />
               </button>
@@ -560,7 +561,7 @@ export default function TicketList({
                   onBlur={handlePageInputBlur}
                   className="w-6 text-center bg-transparent text-sm font-medium text-blue-600 focus:outline-none"
                 />
-                <span className="text-gray-400 text-[10px] font-medium uppercase tracking-wider border-l border-white/40 pl-3">
+                <span className="text-slate-400 text-[10px] font-medium uppercase tracking-[0.2em] border-l border-white/40 pl-3">
                   of {totalPages}
                 </span>
               </div>
@@ -572,7 +573,7 @@ export default function TicketList({
                   setPageInput(String(newPage));
                 }}
                 disabled={currentPage === totalPages}
-                className="p-2.5 glass-button rounded-xl text-gray-400 hover:text-blue-600 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                className="p-2.5 glass-button rounded-xl text-slate-400 hover:text-blue-600 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
               >
                 <Icons.ChevronRight className="w-5 h-5" />
               </button>
@@ -581,11 +582,6 @@ export default function TicketList({
         )}
       </div>
 
-      <TicketDrawer
-        ticket={selectedTicket}
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-      />
     </div>
   );
 }

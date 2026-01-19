@@ -89,15 +89,16 @@ export default function LoginView({ initialError }: LoginViewProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Harry Botter Portal</h1>
-          <p className="text-gray-600 mt-2">Sign in to submit or track your tickets.</p>
+    <div className="min-h-screen flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md glass-panel rounded-[2rem] shadow-[0_24px_80px_-60px_rgba(37,99,235,0.5)] border border-white/60 p-8">
+        <div className="text-center mb-8 space-y-2">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-blue-500/70 font-semibold">Welcome</p>
+          <h1 className="text-3xl font-semibold text-slate-900">Harry Botter Portal</h1>
+          <p className="text-slate-500">Sign in to submit or track your tickets.</p>
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50/70 px-4 py-3 text-sm text-rose-700">
             {error}
           </div>
         )}
@@ -106,7 +107,7 @@ export default function LoginView({ initialError }: LoginViewProps) {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isSigningIn}
-          className="w-full inline-flex items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70"
+          className="w-full inline-flex items-center justify-center gap-3 rounded-2xl border border-white/70 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-700 shadow-[0_14px_30px_-22px_rgba(15,23,42,0.45)] hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-70 transition-all"
         >
           <svg
             className="h-5 w-5"

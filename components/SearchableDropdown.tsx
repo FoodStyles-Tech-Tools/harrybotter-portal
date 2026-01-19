@@ -105,7 +105,7 @@ export default function SearchableDropdown({
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors z-10"
+              className="absolute right-10 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition-colors z-10"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                 <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
@@ -125,7 +125,7 @@ export default function SearchableDropdown({
             onKeyDown={handleKeyDown}
             placeholder={isLoading ? 'Loading...' : placeholder}
             disabled={isLoading}
-            className={`w-full h-11 px-4 text-sm glass-input rounded-xl font-medium transition-all duration-300 placeholder:text-gray-300 ${
+            className={`w-full h-11 px-4 text-sm glass-input rounded-xl font-normal transition-all duration-300 placeholder:text-slate-300 ${
               isLoading ? 'opacity-50 pointer-events-none' : ''
             } ${allowClear && selectedOption ? 'pr-14' : 'pr-10'}`}
           />
@@ -139,7 +139,7 @@ export default function SearchableDropdown({
 
       {isOpen && (
         <div
-          className="absolute z-[100] w-full mt-2 glass-panel rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.1)] max-h-60 overflow-y-auto overflow-x-hidden p-1 animate-in fade-in slide-in-from-top-2 duration-200"
+          className="absolute z-[100] w-full mt-2 glass-panel rounded-2xl shadow-[0_24px_60px_-45px_rgba(37,99,235,0.4)] max-h-60 overflow-y-auto overflow-x-hidden p-1 animate-in fade-in slide-in-from-top-2 duration-200 bg-white/85"
           style={{ transformOrigin: 'top' }}
         >
           {filteredOptions.length > 0 ? (
@@ -150,8 +150,8 @@ export default function SearchableDropdown({
                 onMouseEnter={() => setHighlightedIndex(index)}
                 className={`px-3 py-2.5 cursor-pointer rounded-xl transition-all duration-200 flex items-center gap-3 mb-0.5 last:mb-0 ${
                   highlightedIndex === index
-                    ? 'bg-blue-600 text-white shadow-md scale-[1.02] z-10'
-                    : 'text-gray-600 hover:bg-white/60 hover:text-gray-900 shadow-sm'
+                    ? 'bg-blue-600/95 text-white shadow-md scale-[1.02] z-10'
+                    : 'bg-white/80 text-slate-800 hover:bg-white hover:text-slate-900 shadow-sm'
                 }`}
               >
                 {option.avatar_url && !(failedAvatars[String(option.id ?? option.name)] ?? false) ? (
@@ -179,9 +179,9 @@ export default function SearchableDropdown({
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate leading-tight">{option.name}</div>
+                  <div className="text-sm font-light truncate leading-tight">{option.name}</div>
                   {option.email && (
-                    <div className={`text-[10px] truncate mt-0.5 ${highlightedIndex === index ? 'text-white/70' : 'text-gray-400'}`}>
+                    <div className={`text-[10px] truncate mt-0.5 ${highlightedIndex === index ? 'text-white/70' : 'text-slate-500'}`}>
                       {option.email}
                     </div>
                   )}
@@ -197,7 +197,7 @@ export default function SearchableDropdown({
             ))
           ) : (
             <div className="px-4 py-8 text-center">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">No results found</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">No results found</p>
             </div>
           )}
         </div>

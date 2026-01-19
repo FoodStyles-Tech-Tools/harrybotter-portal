@@ -16,12 +16,18 @@ interface ChatSidebarProps {
   onNewChat: () => void;
 }
 
-const Icons = {
+  const Icons = {
   History: (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
       <path d="M3 3v5h5" />
       <path d="M12 7v5l4 2" />
+    </svg>
+  ),
+  Edit: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
     </svg>
   ),
   Plus: (props: React.SVGProps<SVGSVGElement>) => (
@@ -121,26 +127,25 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
   };
 
   return (
-    <div className="w-80 h-full glass-panel flex flex-col flex-shrink-0 z-20 font-sans border-r border-white/20">
+    <div className="w-72 lg:w-80 h-full glass-panel flex flex-col flex-shrink-0 z-20 border-r border-white/30">
       {/* New Chat Button Area */}
       <div className="p-6">
         <button
           onClick={onNewChat}
-          className="group w-full flex items-center justify-start gap-4 px-5 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-sm font-semibold transition-all duration-300 shadow-[0_4px_12px_rgba(37,99,235,0.2)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)] hover:scale-[1.01] active:scale-95"
+          className="w-full flex items-center gap-3 px-4 py-3 bg-slate-100 text-slate-600 rounded-xl text-sm font-light border border-slate-200 shadow-sm"
         >
-          <div className="p-1.5 rounded-xl bg-white/20 group-hover:rotate-90 transition-transform duration-500">
-            <Icons.Plus className="w-5 h-5 text-white" strokeWidth={3} />
-          </div>
-          New Conversation
+          <Icons.Edit className="w-4 h-4 text-slate-500" />
+          New chat
         </button>
       </div>
+
 
       <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-6 pt-2">
         
         {/* Chats History Section */}
         <div className="space-y-4">
           <div className="px-3 flex items-center justify-between">
-            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Recent Activity</span>
+            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em]">Chats</span>
             <div className="flex gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
               <span className="w-1.5 h-1.5 rounded-full bg-blue-300 opacity-50" />
@@ -155,54 +160,27 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
                 ))}
               </div>
             ) : sessions.length === 0 ? (
-              <div className="px-4 py-10 text-center glass-button rounded-2xl border-dashed border-white/40">
-                <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider italic">No history yet</p>
+              <div className="px-4 py-10 text-center glass-button rounded-2xl border-dashed border-white/50">
+                <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-[0.2em] italic">No history yet</p>
               </div>
             ) : (
               sessions.map((session) => (
                 <button
                   key={session.id}
                   onClick={() => onSelectSession(session.id)}
-                  className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm transition-all duration-300 group text-left relative overflow-hidden ${
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm transition-all duration-200 group text-left ${
                     currentSessionId === session.id
-                      ? 'bg-white text-blue-600 shadow-[0_4px_15px_rgba(0,0,0,0.05)] scale-[1.01] z-10'
-                      : 'text-gray-500 hover:bg-white/40 hover:text-gray-900'
+                      ? 'bg-blue-100/80 text-blue-700'
+                      : 'text-slate-600 hover:bg-white/60 hover:text-slate-900'
                   }`}
                 >
-                  {currentSessionId === session.id && (
-                    <div className="absolute left-0 top-3 bottom-3 w-1 bg-blue-600 rounded-r-full" />
-                  )}
-                  
-                  <div className={`p-2 rounded-xl flex-shrink-0 transition-all duration-300 ${
-                    currentSessionId === session.id 
-                    ? 'bg-blue-50 text-blue-600 scale-110 shadow-sm' 
-                    : 'bg-white/50 text-gray-400 group-hover:bg-white group-hover:text-blue-500'
-                  }`}>
-                    {session.ticket_id ? (
-                      <Icons.Sparkles className="w-4 h-4" />
-                    ) : (
-                      <Icons.Chat className="w-4 h-4" />
-                    )}
-                  </div>
-
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className={`truncate font-semibold tracking-tight ${currentSessionId === session.id ? 'text-gray-900' : ''}`}>
+                    <span className="truncate font-light">
                       {session.ticket_id || session.title || 'Untitled Session'}
                     </span>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className={`text-[10px] font-medium ${currentSessionId === session.id ? 'text-blue-500/70' : 'text-gray-400'}`}>
-                        {formatRelativeTime(session.updated_at)}
-                      </span>
-                      {session.ticket_id && (
-                        <span className={`px-1.5 py-0.5 rounded-md text-[8px] font-semibold uppercase tracking-wider ${
-                          currentSessionId === session.id 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-emerald-500/10 text-emerald-600'
-                        }`}>
-                          Ticket
-                        </span>
-                      )}
-                    </div>
+                    <span className={`text-[10px] font-light ${currentSessionId === session.id ? 'text-blue-600/70' : 'text-slate-400'}`}>
+                      {formatRelativeTime(session.updated_at)}
+                    </span>
                   </div>
 
                   {/* Delete Button */}
@@ -211,14 +189,14 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
                     className={`p-2 rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100 flex-shrink-0 ${
                       deletingId === session.id
                         ? 'bg-rose-500 text-white opacity-100 animate-pulse'
-                        : currentSessionId === session.id
-                        ? 'hover:bg-rose-50 text-rose-500'
+                      : currentSessionId === session.id
+                        ? 'hover:bg-white/80 text-rose-500'
                         : 'hover:bg-white text-rose-500 shadow-sm'
                     }`}
-                    title={deletingId === session.id ? 'Confirm?' : 'Delete'}
+                    title={deletingId === session.id ? 'Click to confirm delete' : 'Delete'}
                   >
                     {deletingId === session.id ? (
-                      <span className="text-[10px] font-bold px-1">DEL?</span>
+                      <span className="text-[10px] font-semibold px-1">Confirm</span>
                     ) : (
                       <Icons.Trash className="w-3.5 h-3.5" />
                     )}

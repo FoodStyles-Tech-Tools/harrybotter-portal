@@ -50,7 +50,7 @@ const PRIORITY_OPTIONS = [
     label: 'Medium',
     icon: () => (
       <div className="w-4 h-4 flex items-center justify-center">
-        <div className="w-3 h-0.5 bg-yellow-500 rounded-sm" />
+        <div className="w-3 h-0.5 bg-blue-400 rounded-sm" />
       </div>
     ),
   },
@@ -392,9 +392,9 @@ export default function TicketForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-5 bg-white/30 rounded-[1.5rem] border border-white/40 shadow-sm backdrop-blur-md">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-5 glass-panel rounded-[1.5rem] border border-white/40 shadow-sm">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2 ml-1">
+          <label className="block text-sm font-semibold text-slate-700 mb-2 ml-1">
             Project (Optional)
           </label>
           <SearchableDropdown
@@ -407,7 +407,7 @@ export default function TicketForm({
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2 ml-1">
+          <label className="block text-sm font-semibold text-slate-700 mb-2 ml-1">
             Assignee (Optional)
           </label>
           <SearchableDropdown
@@ -423,34 +423,34 @@ export default function TicketForm({
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Tickets</h3>
+          <h3 className="text-lg font-semibold text-slate-900">Tickets</h3>
           <button
             type="button"
             onClick={addTicketRow}
-            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-blue-600 bg-white/50 border border-blue-100 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm hover:shadow-blue-100 active:scale-[0.98] backdrop-blur-sm group"
+            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-blue-600 bg-white/70 border border-blue-100/70 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm hover:shadow-blue-100 active:scale-[0.98] backdrop-blur-sm group"
           >
             <Icons.Plus className="w-3.5 h-3.5 transition-transform group-hover:rotate-90" />
             Add Row
           </button>
         </div>
 
-        <div className="overflow-hidden rounded-[1.5rem] border border-white/40 shadow-sm bg-white/20 backdrop-blur-sm">
+        <div className="overflow-hidden rounded-[1.5rem] border border-white/40 shadow-sm bg-white/25 backdrop-blur-sm">
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-white/40 border-b border-white/40">
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
                   Details *
                 </th>
-                <th className="px-3 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest" style={{ width: '14%' }}>
+                <th className="px-3 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '14%' }}>
                   Expected Done
                 </th>
-                <th className="px-3 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest" style={{ width: '12%' }}>
+                <th className="px-3 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '12%' }}>
                   Type
                 </th>
-                <th className="px-3 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest" style={{ width: '12%' }}>
+                <th className="px-3 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '12%' }}>
                   Priority
                 </th>
-                <th className="px-4 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest w-20">
+                <th className="px-4 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-[0.2em] w-20">
                   Actions
                 </th>
               </tr>
@@ -464,7 +464,7 @@ export default function TicketForm({
                   <td className="px-4 py-3">
                     <div className="space-y-2">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Ticket *</label>
+                        <label className="block text-xs font-medium text-slate-700 mb-1">Ticket *</label>
                         <textarea
                           value={ticket.title}
                           onChange={(e) => updateTicket(index, 'title', e.target.value)}
@@ -475,7 +475,7 @@ export default function TicketForm({
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1 ml-1">Description</label>
+                        <label className="block text-xs font-medium text-slate-400 mb-1 ml-1">Description</label>
                         <div className="border border-white/50 rounded-xl p-3 bg-white/30 shadow-sm group focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:bg-white/70 transition-all">
                           <textarea
                             data-ticket-index={index}
@@ -493,7 +493,7 @@ export default function TicketForm({
                             }}
                             placeholder="Describe the task in detail..."
                             rows={2}
-                            className="w-full px-2 py-1 text-[0.85rem] border-0 bg-transparent focus:outline-none focus:ring-0 resize-none min-h-[30px] leading-relaxed text-gray-600"
+                            className="w-full px-2 py-1 text-[0.85rem] border-0 bg-transparent focus:outline-none focus:ring-0 resize-none min-h-[30px] leading-relaxed text-slate-600"
                             style={{ overflow: 'hidden' }}
                           />
                           <div className="flex justify-end mt-2">
@@ -524,7 +524,7 @@ export default function TicketForm({
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1 ml-1">Url (Optional)</label>
+                        <label className="block text-xs font-medium text-slate-400 mb-1 ml-1">Url (Optional)</label>
                         <input
                           type="url"
                           value={ticket.url || ''}
@@ -535,20 +535,20 @@ export default function TicketForm({
                       </div>
                       {rephraseResult && rephrasingIndex === index && (
                         <div
-                          className="p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                          className="p-3 bg-blue-50/80 border border-blue-200 rounded-lg"
                         >
                           <div className="space-y-2">
                             <div>
-                              <p className="text-xs font-semibold text-gray-700 mb-1">Task Name:</p>
-                              <p className="text-sm text-gray-900">{rephraseResult.taskName}</p>
+                              <p className="text-xs font-semibold text-slate-700 mb-1">Task Name:</p>
+                              <p className="text-sm text-slate-900">{rephraseResult.taskName}</p>
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-gray-700 mb-1">Description:</p>
-                              <p className="text-sm text-gray-900">{rephraseResult.description}</p>
+                              <p className="text-xs font-semibold text-slate-700 mb-1">Description:</p>
+                              <p className="text-sm text-slate-900">{rephraseResult.description}</p>
                             </div>
                             {rephraseResult.url && rephraseResult.url.trim() && (
                               <div>
-                                <p className="text-xs font-semibold text-gray-700 mb-1">URL:</p>
+                                <p className="text-xs font-semibold text-slate-700 mb-1">URL:</p>
                                 <p className="text-sm text-blue-600 break-all">
                                   <a href={rephraseResult.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
                                     {rephraseResult.url}
@@ -618,7 +618,7 @@ export default function TicketForm({
                       type="button"
                       onClick={() => removeTicketRow(index)}
                       disabled={tickets.length === 1}
-                      className="text-red-500 hover:text-red-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                      className="text-red-500 hover:text-red-700 disabled:text-slate-300 disabled:cursor-not-allowed"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -636,7 +636,7 @@ export default function TicketForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2.5 px-8 py-3 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 active:scale-[0.98]"
+          className="flex items-center gap-2.5 px-8 py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 active:scale-[0.98]"
         >
           {isSubmitting ? (
             <>

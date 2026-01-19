@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import AppHeader from '@/components/AppHeader';
+import GlobalTicketSearch from '@/components/GlobalTicketSearch';
 import QuickAddModal from '@/components/QuickAddModal';
 import { getBetterAuthSession, hasBetterAuthSessionCookie } from '@/lib/server-session';
 
@@ -36,6 +37,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
       <AppHeader userName={userName} userImage={userImage} />
       <main className="w-full">{children}</main>
       <QuickAddModal />
+      <GlobalTicketSearch />
     </div>
   );
 }

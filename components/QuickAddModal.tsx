@@ -59,6 +59,11 @@ export default function QuickAddModal() {
   const assigneeOptions: DropdownOption[] = useMemo(() => teamMembers.map(m => ({ id: m.id, name: m.name, email: m.email, avatar_url: m.avatar_url })), [teamMembers]);
 
   useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't trigger if user is typing in an input, textarea or contenteditable
       const target = e.target as HTMLElement;
@@ -85,6 +90,7 @@ export default function QuickAddModal() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('open-quick-add', handleOpenModal);
+      document.body.style.overflow = '';
     };
   }, [isOpen]);
 
@@ -143,17 +149,17 @@ export default function QuickAddModal() {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       <div 
-        className="absolute inset-0 bg-blue-900/10 backdrop-blur-md transition-opacity"
+        className="absolute inset-0 bg-blue-900/30 transition-opacity"
         onClick={() => setIsOpen(false)}
       />
       
-      <div className="relative w-full max-w-2xl bg-white/70 backdrop-blur-2xl rounded-[2rem] border border-white/60 shadow-2xl overflow-hidden font-outfit transition-all duration-300 transform scale-100 opacity-100">
+      <div className="relative w-full max-w-2xl glass-panel bg-white rounded-[2rem] border border-white/60 shadow-2xl overflow-hidden transition-all duration-300 transform scale-100 opacity-100">
         <div className="p-6 sm:p-8">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">Create New Ticket</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Create New Ticket</h2>
             <button 
               onClick={() => setIsOpen(false)}
-              className="p-2 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-white/50 transition-all"
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-white/60 transition-all"
             >
               <Icons.Close className="w-5 h-5" />
             </button>
@@ -161,53 +167,51 @@ export default function QuickAddModal() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Type Selection */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setType('Bug')}
-                className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 ${
+                className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all gap-2 ${
                   type === 'Bug' 
-                    ? 'bg-rose-50 border-rose-500 text-rose-600 shadow-sm' 
-                    : 'bg-white/40 border-white/60 text-gray-400 hover:border-gray-300 hover:bg-white/60'
+                    ? 'bg-rose-50 border-rose-300 text-rose-600' 
+                    : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
                 }`}
               >
                 <Icons.Bug className="w-6 h-6" />
-                <span className="text-sm font-semibold uppercase tracking-wider">Bug</span>
-                <p className="text-[10px] opacity-70">Report a problem</p>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em]">Bug</span>
+                <p className="text-[10px] opacity-60">Report a problem</p>
               </button>
               <button
                 type="button"
                 onClick={() => setType('Request')}
-                className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 ${
+                className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all gap-2 ${
                   type === 'Request' 
-                    ? 'bg-blue-50 border-blue-500 text-blue-600 shadow-sm' 
-                    : 'bg-white/40 border-white/60 text-gray-400 hover:border-gray-300 hover:bg-white/60'
+                    ? 'bg-blue-50 border-blue-300 text-blue-600' 
+                    : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
                 }`}
               >
                 <Icons.Request className="w-6 h-6" />
-                <span className="text-sm font-semibold uppercase tracking-wider">Request</span>
-                <p className="text-[10px] opacity-70">Ask for a feature</p>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em]">Request</span>
+                <p className="text-[10px] opacity-60">Ask for a feature</p>
               </button>
             </div>
 
             {/* Priority Selection */}
             <div>
-              <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Priority</label>
-              <div className="flex bg-white/40 p-1.5 rounded-2xl border border-white/60 gap-1.5">
+              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Priority</label>
+              <div className="flex items-center gap-2">
                 {[
-                  { id: 'Low', color: 'bg-gray-400', active: 'bg-gray-500 shadow-gray-200' },
-                  { id: 'Medium', color: 'bg-blue-400', active: 'bg-blue-500 shadow-blue-200' },
-                  { id: 'High', color: 'bg-indigo-600/70', active: 'bg-indigo-600 text-indigo-200 shadow-indigo-100' },
-                  { id: 'Urgent', color: 'bg-red-500', active: 'bg-rose-500 shadow-rose-200' }
+                  { id: 'Low', active: 'bg-slate-200 text-slate-700', idle: 'text-slate-500 hover:bg-slate-100' },
+                  { id: 'Medium', active: 'bg-blue-500 text-white', idle: 'text-slate-500 hover:bg-blue-50' },
+                  { id: 'High', active: 'bg-orange-500 text-white', idle: 'text-slate-500 hover:bg-orange-50' },
+                  { id: 'Urgent', active: 'bg-red-500 text-white', idle: 'text-slate-500 hover:bg-red-50' }
                 ].map((p) => (
                   <button
                     key={p.id}
                     type="button"
                     onClick={() => setPriority(p.id as any)}
-                    className={`flex-1 py-2.5 text-xs font-semibold rounded-xl transition-all ${
-                      priority === p.id 
-                        ? `${p.active} text-white shadow-md scale-[1.01]` 
-                        : 'text-gray-500 hover:bg-white/50'
+                    className={`flex-1 py-2.5 text-xs font-semibold rounded-xl border border-transparent transition-all ${
+                      priority === p.id ? p.active : p.idle
                     }`}
                   >
                     {p.id}
@@ -218,7 +222,7 @@ export default function QuickAddModal() {
 
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">Project</label>
+                <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Project</label>
                 <SearchableDropdown
                   options={projectOptions}
                   placeholder="Optional"
@@ -229,7 +233,7 @@ export default function QuickAddModal() {
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">Assignee</label>
+                <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Assignee</label>
                 <SearchableDropdown
                   options={assigneeOptions}
                   placeholder="Optional"
@@ -243,34 +247,34 @@ export default function QuickAddModal() {
 
             <div className="space-y-4 pt-2">
               <div>
-                <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">Ticket Title</label>
+                <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Ticket Title</label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="What is the ticket title?"
                   required
-                  className="w-full px-4 py-3.5 bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition-all text-sm font-medium font-outfit"
+                  className="w-full px-4 py-3.5 glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white/70 transition-all text-sm font-medium"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">Description</label>
+                <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe the details..."
                   rows={4}
-                  className="w-full px-4 py-3.5 bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition-all text-sm resize-none font-outfit"
+                  className="w-full px-4 py-3.5 glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white/70 transition-all text-sm resize-none"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">Relevant Link</label>
+                <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Relevant Link</label>
                 <input
                   type="url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition-all text-xs font-outfit"
+                  className="w-full px-4 py-3 glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white/70 transition-all text-xs"
                 />
               </div>
             </div>
@@ -282,7 +286,7 @@ export default function QuickAddModal() {
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting || !title.trim()}
-            className="px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/10 hover:bg-blue-700 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 text-xs"
+            className="px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-2xl shadow-lg shadow-blue-500/10 hover:bg-blue-700 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 text-xs"
           >
             {isSubmitting ? (
               <svg className="animate-spin h-3.5 w-3.5 text-white" viewBox="0 0 24 24">

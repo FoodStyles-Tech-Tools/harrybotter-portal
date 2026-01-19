@@ -26,20 +26,20 @@ function ToastItem({ toast, onClose }: ToastProps) {
   }, [toast.id, toast.duration, onClose]);
 
   const bgColor = {
-    success: 'bg-green-50 border-green-200',
-    error: 'bg-red-50 border-red-200',
-    info: 'bg-blue-50 border-blue-200',
+    success: 'bg-white/80 border-emerald-200/70',
+    error: 'bg-white/80 border-rose-200/70',
+    info: 'bg-white/80 border-blue-200/70',
   }[toast.type];
 
   const textColor = {
-    success: 'text-green-800',
-    error: 'text-red-800',
-    info: 'text-blue-800',
+    success: 'text-slate-700',
+    error: 'text-slate-700',
+    info: 'text-slate-700',
   }[toast.type];
 
   const iconColor = {
-    success: 'text-green-600',
-    error: 'text-red-600',
+    success: 'text-emerald-600',
+    error: 'text-rose-600',
     info: 'text-blue-600',
   }[toast.type];
 
@@ -63,7 +63,7 @@ function ToastItem({ toast, onClose }: ToastProps) {
 
   return (
     <div
-      className={`${bgColor} border rounded-xl shadow-lg p-4 flex items-start gap-3 min-w-[300px] max-w-md`}
+      className={`${bgColor} border rounded-2xl shadow-[0_18px_50px_-40px_rgba(15,23,42,0.4)] p-4 flex items-start gap-3 min-w-[300px] max-w-md backdrop-blur-xl`}
     >
       <div className={`${iconColor} flex-shrink-0 mt-0.5`}>{icon}</div>
       <div className={`flex-1 ${textColor} text-sm font-medium`}>{toast.message}</div>
