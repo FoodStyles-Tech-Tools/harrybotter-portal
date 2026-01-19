@@ -229,8 +229,9 @@ export default function AssetsPage() {
                                       </a>
                                     ),
                                     pre: ({ children }) => <pre className="markdown-pre">{children}</pre>,
-                                    code: ({ inline, children }) => {
-                                      if (inline) {
+                                    code: ({ children, className }) => {
+                                      const isInline = !className;
+                                      if (isInline) {
                                         return <code className="markdown-code">{children}</code>;
                                       }
                                       return <code>{children}</code>;
@@ -341,8 +342,9 @@ export default function AssetsPage() {
                         </a>
                       ),
                       pre: ({ children }) => <pre className="markdown-pre">{children}</pre>,
-                      code: ({ inline, children }) => {
-                        if (inline) {
+                      code: ({ children, className }) => {
+                        const isInline = !className;
+                        if (isInline) {
                           return <code className="markdown-code">{children}</code>;
                         }
                         return <code>{children}</code>;

@@ -16,7 +16,7 @@ export default function TicketDrawer({ ticket, isOpen, onClose }: TicketDrawerPr
     if (ticket) {
       setFailedReporterAvatar(false);
     }
-  }, [ticket?.id]);
+  }, [ticket]);
 
   if (!ticket) return null;
 
