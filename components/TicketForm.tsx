@@ -391,10 +391,10 @@ export default function TicketForm({
   }, [project?.id, initialProjects, assigneeOptions, assignee, updateState]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-5 glass-panel rounded-[1.5rem] border border-white/40 shadow-sm">
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 glass-panel rounded-[1.5rem] border border-white/40 shadow-sm">
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2 ml-1">
+          <label className="block text-sm font-semibold text-slate-700 mb-1 ml-1">
             Project (Optional)
           </label>
           <SearchableDropdown
@@ -407,7 +407,7 @@ export default function TicketForm({
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2 ml-1">
+          <label className="block text-sm font-semibold text-slate-700 mb-1 ml-1">
             Assignee (Optional)
           </label>
           <SearchableDropdown
@@ -421,9 +421,9 @@ export default function TicketForm({
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-slate-900">Tickets</h3>
+          <h3 className="text-base font-semibold text-slate-900">Tickets</h3>
           <button
             type="button"
             onClick={addTicketRow}
@@ -438,19 +438,19 @@ export default function TicketForm({
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-white/40 border-b border-white/40">
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
+                <th className="px-4 py-2 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
                   Details *
                 </th>
-                <th className="px-3 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '14%' }}>
+                <th className="px-2 py-2 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '14%' }}>
                   Expected Done
                 </th>
-                <th className="px-3 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '12%' }}>
+                <th className="px-2 py-2 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '12%' }}>
                   Type
                 </th>
-                <th className="px-3 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '12%' }}>
+                <th className="px-2 py-2 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '12%' }}>
                   Priority
                 </th>
-                <th className="px-4 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-[0.2em] w-20">
+                <th className="px-3 py-2 text-center text-xs font-bold text-slate-400 uppercase tracking-[0.2em] w-20">
                   Actions
                 </th>
               </tr>
@@ -461,22 +461,22 @@ export default function TicketForm({
                   key={index}
                   className="hover:bg-white/40 transition-colors"
                 >
-                  <td className="px-4 py-3">
-                    <div className="space-y-2">
+                  <td className="px-3 py-2">
+                    <div className="space-y-1.5">
                       <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">Ticket *</label>
+                        <label className="block text-xs font-medium text-slate-700 mb-0.5">Ticket *</label>
                         <textarea
                           value={ticket.title}
                           onChange={(e) => updateTicket(index, 'title', e.target.value)}
                           placeholder="Task title..."
                           required
                           rows={1}
-                          className="w-full px-3 py-1.5 text-[0.9rem] bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition-all resize-none shadow-sm font-medium"
+                          className="w-full px-2.5 py-1 text-[0.9rem] bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition-all resize-none shadow-sm font-medium"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1 ml-1">Description</label>
-                        <div className="border border-white/50 rounded-xl p-3 bg-white/30 shadow-sm group focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:bg-white/70 transition-all">
+                        <label className="block text-xs font-medium text-slate-400 mb-0.5 ml-1">Description</label>
+                        <div className="border border-white/50 rounded-xl p-2 bg-white/30 shadow-sm group focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:bg-white/70 transition-all">
                           <textarea
                             data-ticket-index={index}
                             data-field="description"
@@ -493,10 +493,10 @@ export default function TicketForm({
                             }}
                             placeholder="Describe the task in detail..."
                             rows={2}
-                            className="w-full px-2 py-1 text-[0.85rem] border-0 bg-transparent focus:outline-none focus:ring-0 resize-none min-h-[30px] leading-relaxed text-slate-600"
+                            className="w-full px-2 py-0.5 text-[0.85rem] border-0 bg-transparent focus:outline-none focus:ring-0 resize-none min-h-[30px] leading-relaxed text-slate-600"
                             style={{ overflow: 'hidden' }}
                           />
-                          <div className="flex justify-end mt-2">
+                          <div className="flex justify-end mt-1.5">
                             <button
                               type="button"
                               onClick={() => handleRephrase(index)}
@@ -524,20 +524,20 @@ export default function TicketForm({
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1 ml-1">Url (Optional)</label>
+                        <label className="block text-xs font-medium text-slate-400 mb-0.5 ml-1">Url (Optional)</label>
                         <input
                           type="url"
                           value={ticket.url || ''}
                           onChange={(e) => updateTicket(index, 'url', e.target.value)}
                           placeholder="https://..."
-                          className="w-full px-3 py-2 text-sm bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm"
+                          className="w-full px-2.5 py-1.5 text-sm bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm"
                         />
                       </div>
                       {rephraseResult && rephrasingIndex === index && (
                         <div
-                          className="p-3 bg-blue-50/80 border border-blue-200 rounded-lg"
+                          className="p-2 bg-blue-50/80 border border-blue-200 rounded-lg"
                         >
-                          <div className="space-y-2">
+                          <div className="space-y-1.5">
                             <div>
                               <p className="text-xs font-semibold text-slate-700 mb-1">Task Name:</p>
                               <p className="text-sm text-slate-900">{rephraseResult.taskName}</p>
@@ -583,29 +583,29 @@ export default function TicketForm({
                       )}
                     </div>
                   </td>
-                   <td className="px-2 py-3" style={{ width: '14%' }}>
+                   <td className="px-2 py-2" style={{ width: '14%' }}>
                     <input
                       type="date"
                       value={ticket.expectedDoneDate ?? ''}
                       onChange={(e) => updateTicket(index, 'expectedDoneDate', e.target.value || null)}
-                      className="w-full px-3 py-2 text-xs bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm"
+                      className="w-full px-2 py-1.5 text-xs bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm"
                     />
                   </td>
-                  <td className="px-2 py-3" style={{ width: '12%' }}>
+                  <td className="px-2 py-2" style={{ width: '12%' }}>
                     <select
                       value={ticket.type}
                       onChange={(e) => updateTicket(index, 'type', e.target.value)}
-                      className="w-full px-3 py-2 text-xs bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm appearance-none"
+                      className="w-full px-2 py-1.5 text-xs bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm appearance-none"
                     >
                       <option value="Request">Request</option>
                       <option value="Bug">Bug</option>
                     </select>
                   </td>
-                  <td className="px-2 py-3" style={{ width: '12%' }}>
+                  <td className="px-2 py-2" style={{ width: '12%' }}>
                     <select
                       value={ticket.priority}
                       onChange={(e) => updateTicket(index, 'priority', e.target.value)}
-                      className="w-full px-3 py-2 text-xs bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm appearance-none"
+                      className="w-full px-2 py-1.5 text-xs bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm appearance-none"
                     >
                       <option value="Urgent">Urgent</option>
                       <option value="High">High</option>
@@ -613,7 +613,7 @@ export default function TicketForm({
                       <option value="Low">Low</option>
                     </select>
                   </td>
-                  <td className="px-3 py-2 text-center">
+                  <td className="px-2 py-2 text-center">
                     <button
                       type="button"
                       onClick={() => removeTicketRow(index)}
@@ -632,11 +632,11 @@ export default function TicketForm({
         </div>
       </div>
 
-      <div className="flex justify-end pt-4">
+      <div className="flex justify-end pt-2">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2.5 px-8 py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 active:scale-[0.98]"
+          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 active:scale-[0.98]"
         >
           {isSubmitting ? (
             <>

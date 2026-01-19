@@ -23,10 +23,8 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          '"SF Pro Display"',
-          '"SF Pro Text"',
-          '"SF Pro Icons"',
-          '"Apple SD Gothic Neo"',
+          'var(--font-open-sans)',
+          '"Open Sans"',
           '-apple-system',
           'BlinkMacSystemFont',
           'Segoe UI',

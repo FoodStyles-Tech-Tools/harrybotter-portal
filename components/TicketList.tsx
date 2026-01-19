@@ -7,9 +7,9 @@ import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
 import type { Ticket, Project } from '@/types';
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; ring: string }> = {
-  Open: { bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'ring-emerald-600/10' },
-  'In Progress': { bg: 'bg-blue-50', text: 'text-blue-700', ring: 'ring-blue-600/10' },
-  Completed: { bg: 'bg-sky-50', text: 'text-sky-700', ring: 'ring-sky-600/10' },
+  Open: { bg: 'bg-slate-50', text: 'text-slate-700', ring: 'ring-slate-600/10' },
+  'In Progress': { bg: 'bg-amber-50', text: 'text-amber-700', ring: 'ring-amber-600/10' },
+  Completed: { bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'ring-emerald-600/10' },
   Cancelled: { bg: 'bg-slate-50', text: 'text-slate-600', ring: 'ring-slate-600/10' },
   Rejected: { bg: 'bg-rose-50', text: 'text-rose-700', ring: 'ring-rose-600/10' },
   'On Hold': { bg: 'bg-slate-50', text: 'text-slate-700', ring: 'ring-slate-600/10' },
@@ -459,7 +459,7 @@ export default function TicketList({
                         </div>
                       </td>
                       <td className="px-4 py-5 align-middle">
-                        <p className="text-sm font-light text-slate-700 group-hover:text-slate-900 transition-colors line-clamp-1">
+                        <p className="text-sm font-light text-slate-700 group-hover:text-slate-900 transition-colors break-words">
                           {highlightText(ticket.title, searchFilter)}
                         </p>
                       </td>

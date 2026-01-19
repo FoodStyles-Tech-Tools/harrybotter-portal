@@ -155,7 +155,7 @@ export default function GlobalTicketSearch() {
                     <span className="text-xs text-blue-600 font-light">
                       {ticket.display_id || ticket.id}
                     </span>
-                    <span className="flex-1 truncate">{ticket.title}</span>
+                    <span className="flex-1 break-words">{ticket.title}</span>
                     <span className="text-xs text-slate-400">{ticket.status}</span>
                   </button>
                 ))}
@@ -180,7 +180,7 @@ export default function GlobalTicketSearch() {
                 <span className="text-xs text-blue-600 font-light">
                   {ticket.display_id || ticket.id}
                 </span>
-                <span className="flex-1 truncate">{ticket.title}</span>
+                <span className="flex-1 break-words">{ticket.title}</span>
                 <span className="text-xs text-slate-400">{ticket.status}</span>
               </button>
             ))
