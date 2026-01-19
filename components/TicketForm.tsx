@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
 import type { TeamMember, Project, TicketFormData } from '@/types';
 
@@ -163,7 +163,7 @@ export default function TicketForm({
     }
   }, [isRephrasing]);
 
-  const updateState = (updates: Partial<{
+  const updateState = useCallback((updates: Partial<{
     project: DropdownOption | null;
     assignee: DropdownOption | null;
     tickets: TicketFormData[];
@@ -179,7 +179,7 @@ export default function TicketForm({
       if (updates.assignee !== undefined) setLocalAssignee(updates.assignee);
       if (updates.tickets !== undefined) setLocalTickets(updates.tickets);
     }
-  };
+  }, [onFormStateChange, project, assignee, tickets]);
 
 
   const addTicketRow = () => {

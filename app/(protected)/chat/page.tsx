@@ -445,7 +445,7 @@ export default function TechToolAssistantPage() {
                   Hello, <span className="text-blue-600">{firstName}</span>
                 </h1>
                 <p className="text-xl md:text-2xl text-slate-400 font-medium tracking-tight max-w-2xl mx-auto leading-tight">
-                  I'm your TechTool Assistant.
+                  I&apos;m your TechTool Assistant.
                 </p>
                 
               </div>

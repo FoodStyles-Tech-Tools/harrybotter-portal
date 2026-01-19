@@ -10,12 +10,15 @@ interface TicketDrawerProps {
 }
 
 export default function TicketDrawer({ ticket, isOpen, onClose }: TicketDrawerProps) {
-  if (!ticket) return null;
   const [failedReporterAvatar, setFailedReporterAvatar] = useState(false);
 
   useEffect(() => {
-    setFailedReporterAvatar(false);
-  }, [ticket.id]);
+    if (ticket) {
+      setFailedReporterAvatar(false);
+    }
+  }, [ticket?.id]);
+
+  if (!ticket) return null;
 
   const dueDate = ticket.dueDate || ticket.due_date || null;
   const formatDateTime = (value?: string | null) => {
