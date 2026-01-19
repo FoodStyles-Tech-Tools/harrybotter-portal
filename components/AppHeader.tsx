@@ -76,21 +76,26 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
     : '?';
 
   return (
-    <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl backdrop-saturate-150 border-b border-white/20 transition-all duration-300 shadow-[0_8px_32px_0_rgba(31,38,135,0.04)]">
-      <div className="w-full px-8 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-12">
+    <header className="sticky top-0 z-40 glass-panel border-b border-white/20 transition-all duration-300">
+      <div className="w-full px-8 py-3.5 flex items-center justify-between">
+        <div className="flex items-center gap-10">
           {/* Main Title / Brand */}
-          <Link href="/chat" className="flex items-center gap-2 group">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/30 transition-transform group-hover:scale-105">
+          <Link href="/chat" className="flex items-center gap-3 group">
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]">
               <Icons.Sparkles className="w-5 h-5" />
             </div>
-            <span className="text-xl font-semibold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors">
-              TechTool Assistant
-            </span>
+            <div className="flex flex-col">
+              <span className="text-lg font-semibold text-gray-900 tracking-tight leading-none group-hover:text-blue-600 transition-colors">
+                HarryBotter
+              </span>
+              <span className="text-[10px] font-bold text-blue-500/70 uppercase tracking-wider mt-0.5">
+                Portal
+              </span>
+            </div>
           </Link>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1 bg-white/30 p-1 rounded-2xl border border-white/20">
             {navItems.map((item) => {
               const isActive =
                 pathname === item.href ||
@@ -100,47 +105,49 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-medium transition-all duration-300 ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 shadow-sm ring-1 ring-blue-100'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+                      ? 'bg-white text-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.05)] scale-[1.01]'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-white/40'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-gray-500'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
                   {item.label}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="h-4 w-[1px] bg-gray-200 mx-2 hidden md:block" />
-
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('open-quick-add'))}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-blue-600 text-white shadow-md shadow-blue-500/20 hover:bg-blue-700 hover:shadow-lg transition-all active:scale-[0.98] uppercase tracking-wider"
+            className="flex items-center gap-2 px-5 py-2 rounded-xl text-[11px] font-semibold bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)] hover:bg-blue-700 hover:scale-[1.01] active:scale-95 transition-all uppercase tracking-wider"
           >
-            <Icons.Plus className="w-3.5 h-3.5" strokeWidth={3} />
+            <Icons.Plus className="w-4 h-4" strokeWidth={3} />
             Create
           </button>
         </div>
 
-        {/* User User Profile */}
+        {/* User Profile */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 pl-4 border-l border-gray-200/50">
+          <div className="flex items-center gap-4 pl-6 border-l border-gray-200/30">
             <div className="text-right hidden sm:block">
-              <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Logged in as</p>
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-0.5">Account</p>
               <p className="text-sm font-medium text-gray-900 truncate max-w-[150px]">{userName ?? 'User'}</p>
             </div>
+            
             {userImage ? (
-              <Image
-                src={userImage}
-                alt={userName ?? 'User avatar'}
-                width={40}
-                height={40}
-                className="rounded-full object-cover ring-2 ring-white shadow-sm"
-              />
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity blur-sm" />
+                <Image
+                  src={userImage}
+                  alt={userName ?? 'User avatar'}
+                  width={40}
+                  height={40}
+                  className="relative rounded-full object-cover ring-2 ring-white shadow-sm"
+                />
+              </div>
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 flex items-center justify-center text-sm font-bold ring-2 ring-white shadow-sm">
+              <div className="w-10 h-10 rounded-full glass-button text-blue-600 flex items-center justify-center text-sm font-semibold shadow-sm">
                 {initials}
               </div>
             )}
@@ -148,10 +155,10 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
             <button
               type="button"
               onClick={handleLogout}
-              className="ml-2 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              className="ml-2 p-2.5 rounded-xl glass-button text-gray-400 hover:text-rose-500 hover:bg-rose-50/50 hover:border-rose-100 transition-all group"
               title="Logout"
             >
-              <Icons.Logout className="w-5 h-5" />
+              <Icons.Logout className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
             </button>
           </div>
         </div>

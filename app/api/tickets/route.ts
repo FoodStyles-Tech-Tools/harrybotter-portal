@@ -14,10 +14,10 @@ export async function GET(request: Request) {
     }, {});
 
     const usersData = await supabaseRequest('users', {
-      params: 'select=id,name',
+      params: 'select=id,name,avatar_url',
     });
-    const userMap = usersData.reduce((map: Record<string, string>, u: any) => {
-      map[u.id] = u.name;
+    const userMap = usersData.reduce((map: Record<string, { name: string; avatar: string }>, u: any) => {
+      map[u.id] = { name: u.name, avatar: u.avatar_url };
       return map;
     }, {});
 
@@ -76,12 +76,13 @@ export async function GET(request: Request) {
         title: t.title || '',
         projectName: t.project_id ? projectMap[t.project_id] : 'No Project',
         project_id: t.project_id,
-        requestedBy: t.requested_by_id ? userMap[t.requested_by_id] : '',
+        requestedBy: t.requested_by_id ? userMap[t.requested_by_id]?.name || '' : '',
         requested_by_id: t.requested_by_id,
+        reporterAvatar: t.requested_by_id ? userMap[t.requested_by_id]?.avatar || '' : '',
         priority: formatPriority(t.priority),
         type: formatType(t.type),
         status: formatStatus(t.status),
-        assignee: t.assignee_id ? userMap[t.assignee_id] : '',
+        assignee: t.assignee_id ? userMap[t.assignee_id]?.name || '' : '',
         assignee_id: t.assignee_id,
         // REMOVED: description (only needed in detail view, saves bandwidth)
         description: t.description || '', // Keep for compatibility but could be removed

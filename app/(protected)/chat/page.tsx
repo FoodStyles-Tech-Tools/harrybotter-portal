@@ -376,7 +376,7 @@ export default function TechToolAssistantPage() {
   const firstName = user?.name ? user.name.split(" ")[0] : "User";
 
   return (
-    <div className="flex h-[calc(100vh-4.5rem)] bg-white/60 backdrop-blur-sm overflow-hidden font-outfit">
+    <div className="flex h-[calc(100vh-4.5rem)] overflow-hidden font-sans">
       {/* Sidebar */}
       <ChatSidebar 
         currentSessionId={currentSessionId} 
@@ -385,60 +385,73 @@ export default function TechToolAssistantPage() {
       />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex-1 overflow-y-auto w-full flex flex-col scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-          <div className="flex-1 w-full max-w-4xl mx-auto px-4 md:px-8 py-10 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 bg-white/10 backdrop-blur-md">
+        <div className="flex-1 overflow-y-auto w-full flex flex-col scrollbar-thin">
+          <div className="flex-1 w-full max-w-4xl mx-auto px-6 md:px-12 py-12 flex flex-col">
           {!chatUrl ? (
-            <div className="mt-20 flex flex-col items-center text-center p-8 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
-              <p className="text-gray-500">
-                Missing <code>NEXT_PUBLIC_N8N_CHAT_URL</code> configuration.
+            <div className="mt-20 flex flex-col items-center text-center p-12 glass-panel rounded-3xl border-dashed">
+              <p className="text-gray-500 font-medium">
+                Assistant configuration missing. Please contact support.
               </p>
             </div>
           ) : messages.length === 0 && !isLoadingMessages ? (
             // Empty State / Greeting
-            <div className="flex-1 flex flex-col items-center justify-center text-center">
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl font-medium tracking-tight">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
-                    Hello, {firstName}
-                  </span>
+            <div className="flex-1 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-700">
+              <div className="space-y-6">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-blue-600 text-white shadow-[0_12px_40px_rgba(37,99,235,0.3)] mb-4 animate-bounce-slow">
+                  <Icons.Sparkles className="w-10 h-10" />
+                </div>
+                <h1 className="text-5xl md:text-7xl font-semibold text-gray-900 tracking-tight">
+                  Hello, <span className="text-blue-600">{firstName}</span>
                 </h1>
-                <h2 className="text-4xl md:text-5xl text-[#c4c7c5] font-medium tracking-tight">
-                  How can I help you today?
-                </h2>
+                <p className="text-2xl md:text-3xl text-gray-400 font-medium tracking-tight max-w-2xl mx-auto leading-tight">
+                  I'm your TechTool Assistant. <br/>
+                  <span className="text-gray-300">How can I help you build today?</span>
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4 mt-12 opacity-80">
+                  <button onClick={() => setInputValue("How do I create a new ticket?")} className="glass-button p-4 rounded-2xl text-left hover:border-blue-200 transition-all">
+                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">Guide</p>
+                    <p className="text-sm font-semibold text-gray-700">How do I create a ticket?</p>
+                  </button>
+                  <button onClick={() => setInputValue("What is the status of my tickets?")} className="glass-button p-4 rounded-2xl text-left hover:border-blue-200 transition-all">
+                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">Status</p>
+                    <p className="text-sm font-semibold text-gray-700">Check my ticket status</p>
+                  </button>
+                </div>
               </div>
             </div>
           ) : isLoadingMessages ? (
             <div className="flex items-center justify-center h-full">
-              <div className="flex flex-col items-center gap-4 animate-pulse">
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Icons.Sparkles className="w-6 h-6 text-blue-500" />
+              <div className="flex flex-col items-center gap-6">
+                <div className="w-16 h-16 rounded-3xl bg-blue-50 flex items-center justify-center animate-spin-slow">
+                  <Icons.Sparkles className="w-8 h-8 text-blue-500" />
                 </div>
-                <p className="text-sm text-gray-400">Loading conversation history...</p>
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider animate-pulse">Synchronizing history</p>
               </div>
             </div>
           ) : (
-            <div className="space-y-8 w-full py-2">
+            <div className="space-y-10 w-full py-4">
               {messages.map((message, index) => (
                 <div
                   key={message.id}
-                  className={`flex gap-4 ${
+                  className={`flex gap-6 ${
                     message.sender === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   {/* Bot Avatar */}
                   {message.sender === "bot" && (
-                    <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-md border-2 border-white">
-                       <img src="/wizard-bot.jpg" alt="Wizard Assistant" className="w-full h-full object-cover" />
+                    <div className="w-12 h-12 rounded-2xl overflow-hidden flex-shrink-0 mt-1 shadow-lg border-2 border-white bg-blue-50 flex items-center justify-center">
+                       <Icons.Sparkles className="w-6 h-6 text-blue-600" />
                     </div>
                   )}
 
                   <div className={`flex flex-col ${message.sender === "user" ? "items-end" : "items-start"} max-w-[85%]`}>
                     <div
-                      className={`px-5 py-3 text-[0.95rem] leading-relaxed whitespace-pre-wrap shadow-sm ${
+                      className={`px-6 py-4 text-[0.95rem] leading-relaxed shadow-sm transition-all duration-300 ${
                         message.sender === "user"
-                          ? "bg-[#f0f4f9] text-[#1f1f1f] rounded-2xl rounded-tr-sm"
-                          : "bg-white text-gray-800 rounded-2xl rounded-tl-sm border border-gray-100"
+                          ? "bg-blue-600 text-white rounded-3xl rounded-tr-sm shadow-[0_4px_15px_rgba(37,99,235,0.2)]"
+                          : "glass-panel text-gray-800 rounded-3xl rounded-tl-sm"
                       }`}
                     >
                       {message.sender === "bot" ? (
@@ -449,20 +462,20 @@ export default function TechToolAssistantPage() {
                           isLatest={index === messages.length - 1}
                         />
                       ) : (
-                        message.text
+                        <span className="font-medium">{message.text}</span>
                       )}
                     </div>
 
                     {/* Buttons (if any) */}
                     {message.buttons && message.buttons.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
+                      <div className="flex flex-wrap gap-2 mt-3">
                         {message.buttons.map((label: string) => (
                           <button
                             key={label}
                             type="button"
                             onClick={() => void sendMessage(label)}
                             disabled={isSending}
-                            className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 hover:border-blue-100 disabled:opacity-50 transition-colors shadow-sm"
+                            className="rounded-xl glass-button px-5 py-2.5 text-sm font-semibold text-blue-600 hover:scale-[1.01] active:scale-95 disabled:opacity-50 transition-all shadow-sm"
                           >
                             {label}
                           </button>
@@ -475,15 +488,15 @@ export default function TechToolAssistantPage() {
               
               {/* Loading Indicator */}
               {isSending && (
-                <div className="flex gap-4">
-                   <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 animate-pulse shadow-sm border border-gray-100">
-                       <img src="/wizard-bot.jpg" alt="Wizard Assistant" className="w-full h-full object-cover" />
+                <div className="flex gap-6 animate-in fade-in slide-in-from-bottom-2">
+                   <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shadow-md animate-pulse">
+                       <Icons.Sparkles className="w-6 h-6 text-blue-600" />
                     </div>
-                    <div className="bg-white px-5 py-3.5 rounded-2xl rounded-tl-sm border border-gray-100 shadow-sm">
-                      <div className="flex gap-1">
-                        <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                        <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                        <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce"></span>
+                    <div className="glass-panel px-6 py-5 rounded-3xl rounded-tl-sm">
+                      <div className="flex gap-1.5">
+                        <span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                        <span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                        <span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></span>
                       </div>
                     </div>
                 </div>
@@ -496,29 +509,37 @@ export default function TechToolAssistantPage() {
         </div>
 
         {/* Input Area */}
-        <div className="pb-8 w-full flex-shrink-0">
-          <div className="max-w-4xl mx-auto px-4 md:px-8 w-full">
+        <div className="pb-10 w-full flex-shrink-0">
+          <div className="max-w-4xl mx-auto px-6 md:px-12 w-full">
             {currentTicketId ? (
-              <div className="flex items-center justify-center gap-3 bg-blue-50/50 rounded-full px-6 py-4 border border-blue-100 mb-2 animate-in fade-in duration-500">
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center flex-shrink-0 animate-bounce">
-                  <Icons.Sparkles className="w-4 h-4" />
+              <div className="flex items-center justify-between gap-4 glass-panel rounded-2xl px-6 py-4 mb-2 border-blue-100/50">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/20">
+                    <Icons.Ticket className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Ticket Created</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      ID: <span className="text-blue-600">{currentTicketId}</span>
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm font-semibold text-blue-800">
-                  Ticket <span className="underline">{currentTicketId}</span> has been created. This chat is now locked.
-                </p>
                 <button 
                   onClick={handleNewChat}
-                  className="ml-4 px-4 py-1.5 bg-white text-blue-600 border border-blue-200 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition-all duration-200"
+                  className="px-5 py-2 glass-button text-blue-600 rounded-xl text-xs font-semibold hover:bg-blue-600 hover:text-white transition-all duration-300"
                 >
                   Start New Chat
                 </button>
               </div>
             ) : (
               <div 
-                className={`flex items-center gap-3 bg-white rounded-full px-4 py-3 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.1)] border border-gray-100 focus-within:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] focus-within:border-blue-100 transition-all duration-300 ${
+                className={`flex items-center gap-4 glass-panel rounded-3xl px-5 py-4 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)] focus-within:shadow-[0_20px_60px_-15px_rgba(37,99,235,0.1)] focus-within:border-blue-400/30 transition-all duration-500 ${
                   !chatUrl ? "opacity-50 pointer-events-none" : ""
                 }`}
               >
+                <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
+                  <Icons.Plus className="w-5 h-5" />
+                </div>
                 <input
                   value={inputValue}
                   onChange={(event) => setInputValue(event.target.value)}
@@ -528,8 +549,8 @@ export default function TechToolAssistantPage() {
                       handleSend();
                     }
                   }}
-                  placeholder="Tell us what you need"
-                  className="flex-1 bg-transparent border-none outline-none text-gray-900 text-base placeholder-gray-500 h-full py-1 ml-2"
+                  placeholder="Ask anything or describe your issue..."
+                  className="flex-1 bg-transparent border-none outline-none text-gray-900 text-[15px] font-medium placeholder-gray-400 py-1"
                   disabled={isSending || !chatUrl || !user}
                 />
                 
@@ -537,10 +558,10 @@ export default function TechToolAssistantPage() {
                   type="button"
                   onClick={handleSend}
                   disabled={!canSend || isSending}
-                  className={`p-2 rounded-full transition-all duration-200 ${
+                  className={`p-3 rounded-2xl transition-all duration-300 ${
                     inputValue.trim().length > 0 
-                     ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm" 
-                     : "bg-transparent text-gray-400 hover:text-gray-600"
+                     ? "bg-blue-600 text-white hover:bg-blue-700 shadow-[0_8px_20px_rgba(37,99,235,0.25)] hover:scale-105" 
+                     : "bg-gray-50 text-gray-300"
                   }`}
                 >
                   <Icons.Send className="w-5 h-5" />
@@ -548,9 +569,9 @@ export default function TechToolAssistantPage() {
               </div>
             )}
             
-            <div className="text-center mt-3">
-              <p className="text-xs text-gray-400">
-                TechTool Assistant can make mistakes. Check important info.
+            <div className="text-center mt-4">
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider opacity-60">
+                TechTool AI Assistant &bull; Always check critical info
               </p>
             </div>
           </div>
@@ -559,3 +580,4 @@ export default function TechToolAssistantPage() {
     </div>
   );
 }
+

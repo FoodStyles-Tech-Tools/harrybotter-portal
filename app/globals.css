@@ -2,17 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-bg-hover: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-blur: blur(12px);
+  --primary-blue: #2563eb;
+  --secondary-blue: #3b82f6;
+}
+
 @layer base {
   body {
-    @apply text-gray-900 antialiased min-h-screen selection:bg-blue-100;
+    @apply text-gray-900 antialiased min-h-screen selection:bg-blue-100 font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     background: 
-      radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.4) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(254, 249, 195, 0.3) 0px, transparent 50%),
-      radial-gradient(at 50% 50%, rgba(255, 255, 255, 0.8) 0px, transparent 100%),
-      radial-gradient(at 100% 100%, rgba(245, 208, 254, 0.3) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(199, 210, 254, 0.4) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.6) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(191, 219, 254, 0.4) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(255, 255, 255, 0.9) 0px, transparent 100%),
+      radial-gradient(at 100% 100%, rgba(219, 234, 254, 0.5) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(186, 230, 253, 0.4) 0px, transparent 50%);
     background-attachment: fixed;
-    background-color: #ffffff;
+    background-color: #f8fafc;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-white/45 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.05)];
+  }
+  
+  .glass-button {
+    @apply bg-white/40 backdrop-blur-md border border-white/30 hover:bg-white/60 transition-all duration-300;
+  }
+
+  .glass-input {
+    @apply bg-white/30 backdrop-blur-sm border border-white/20 focus:bg-white/50 focus:border-blue-400/50 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300;
   }
 }
 
@@ -24,19 +50,16 @@
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full;
+  @apply bg-blue-200/50 rounded-full hover:bg-blue-300/50 transition-colors;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400;
-}
 
