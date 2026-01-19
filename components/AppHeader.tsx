@@ -62,7 +62,7 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
   };
 
   const navItems = [
-    { href: '/techtool-assistant', label: 'Chat', icon: Icons.Chat },
+    { href: '/chat', label: 'Chat', icon: Icons.Chat },
     { href: '/submit-ticket', label: 'Submit Ticket', icon: Icons.Plus },
     { href: '/check-ticket', label: 'Check Ticket', icon: Icons.List },
   ];
@@ -81,7 +81,7 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
       <div className="w-full px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-12">
           {/* Main Title / Brand */}
-          <Link href="/techtool-assistant" className="flex items-center gap-2 group">
+          <Link href="/chat" className="flex items-center gap-2 group">
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/30 transition-transform group-hover:scale-105">
               <Icons.Sparkles className="w-5 h-5" />
             </div>

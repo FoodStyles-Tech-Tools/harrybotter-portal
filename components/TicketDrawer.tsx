@@ -58,7 +58,7 @@ export default function TicketDrawer({ ticket, isOpen, onClose }: TicketDrawerPr
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500 mb-2">Created At</h3>
-                <p className="text-sm text-gray-900">{formatDateTime(ticket.createdAt)}</p>
+                <p className="text-sm text-gray-900">{formatDateTime(ticket.created_at)}</p>
               </div>
               {dueDate && (
                 <div>
@@ -66,16 +66,16 @@ export default function TicketDrawer({ ticket, isOpen, onClose }: TicketDrawerPr
                   <p className="text-sm text-gray-900">{formatDateTime(dueDate)}</p>
                 </div>
               )}
-              {ticket.assignedAt && (
+              {ticket.assigned_at && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2">Assigned At</h3>
-                  <p className="text-sm text-gray-900">{formatDateTime(ticket.assignedAt)}</p>
+                  <p className="text-sm text-gray-900">{formatDateTime(ticket.assigned_at)}</p>
                 </div>
               )}
-              {ticket.completedAt && (
+              {ticket.completed_at && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2">Completed At</h3>
-                  <p className="text-sm text-gray-900">{formatDateTime(ticket.completedAt)}</p>
+                  <p className="text-sm text-gray-900">{formatDateTime(ticket.completed_at)}</p>
                 </div>
               )}
               {ticket.status === 'Cancelled' && (() => {

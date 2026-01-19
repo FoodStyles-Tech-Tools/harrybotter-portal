@@ -50,7 +50,7 @@ export default function LoginView({ initialError }: LoginViewProps) {
 
       const messageHandler = (event: MessageEvent) => {
         if (event.data === 'login-success') {
-          window.location.assign('/submit-ticket');
+          window.location.assign('/chat');
           if (!popup.closed) {
             popup.close();
           }
@@ -68,7 +68,7 @@ export default function LoginView({ initialError }: LoginViewProps) {
             if (!popup.closed) {
               popup.close();
             }
-            window.location.assign('/submit-ticket');
+            window.location.assign('/chat');
             return;
           }
         } catch {

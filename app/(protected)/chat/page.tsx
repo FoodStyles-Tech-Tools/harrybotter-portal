@@ -140,15 +140,15 @@ function MarkdownMessage({ text, onAction, disabled, isLatest }: { text: string;
             // Handle standard markdown elements with custom styling
             strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
             em: ({ children }) => <em className="italic">{children}</em>,
-            ul: ({ children }) => <ul className="list-disc pl-5 my-3 space-y-1.5">{children}</ul>,
-            ol: ({ children }) => <ol className="list-decimal pl-5 my-3 space-y-1.5">{children}</ol>,
-            li: ({ children }) => <li className="pl-1">{children}</li>,
-            p: ({ children }) => <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>,
-            h1: ({ children }) => <h1 className="text-2xl font-bold my-4 text-gray-900">{children}</h1>,
-            h2: ({ children }) => <h2 className="text-xl font-bold my-3 text-gray-900">{children}</h2>,
-            h3: ({ children }) => <h3 className="text-lg font-bold my-2 text-gray-900">{children}</h3>,
+            ul: ({ children }) => <ul className="list-disc pl-5 my-1.5 space-y-0.5">{children}</ul>,
+            ol: ({ children }) => <ol className="list-decimal pl-5 my-1.5 space-y-0.5">{children}</ol>,
+            li: ({ children }) => <li className="pl-1 leading-normal">{children}</li>,
+            p: ({ children }) => <p className="mb-1.5 last:mb-0 leading-relaxed">{children}</p>,
+            h1: ({ children }) => <h1 className="text-2xl font-bold mt-3 mb-2 text-gray-900">{children}</h1>,
+            h2: ({ children }) => <h2 className="text-xl font-bold mt-2.5 mb-1.5 text-gray-900">{children}</h2>,
+            h3: ({ children }) => <h3 className="text-lg font-bold mt-2 mb-1 text-gray-900">{children}</h3>,
             code: ({ children }) => <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-sm text-red-600">{children}</code>,
-            pre: ({ children }) => <pre className="bg-gray-900 text-gray-100 p-4 rounded-xl my-4 overflow-x-auto font-mono text-sm">{children}</pre>,
+            pre: ({ children }) => <pre className="bg-gray-900 text-gray-100 p-3 rounded-xl my-2 overflow-x-auto font-mono text-sm">{children}</pre>,
           }}
         >
           {processedContent}
@@ -376,7 +376,7 @@ export default function TechToolAssistantPage() {
   const firstName = user?.name ? user.name.split(" ")[0] : "User";
 
   return (
-    <div className="flex h-[calc(100vh-9rem)] bg-white/60 backdrop-blur-sm rounded-2xl overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] border border-white/60 font-outfit">
+    <div className="flex h-[calc(100vh-4.5rem)] bg-white/60 backdrop-blur-sm overflow-hidden font-outfit">
       {/* Sidebar */}
       <ChatSidebar 
         currentSessionId={currentSessionId} 
@@ -386,7 +386,8 @@ export default function TechToolAssistantPage() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex-1 overflow-y-auto w-full mx-auto p-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+        <div className="flex-1 overflow-y-auto w-full flex flex-col scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+          <div className="flex-1 w-full max-w-4xl mx-auto px-4 md:px-8 py-10 flex flex-col">
           {!chatUrl ? (
             <div className="mt-20 flex flex-col items-center text-center p-8 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
               <p className="text-gray-500">
@@ -395,8 +396,8 @@ export default function TechToolAssistantPage() {
             </div>
           ) : messages.length === 0 && !isLoadingMessages ? (
             // Empty State / Greeting
-            <div className="mt-12 md:mt-24 flex flex-col items-start px-4 md:px-12 animate-in fade-in duration-700 slide-in-from-bottom-4">
-              <div className="mb-12 space-y-2">
+            <div className="flex-1 flex flex-col items-center justify-center text-center">
+              <div className="space-y-4">
                 <h1 className="text-5xl md:text-6xl font-medium tracking-tight">
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
                     Hello, {firstName}
@@ -417,8 +418,7 @@ export default function TechToolAssistantPage() {
               </div>
             </div>
           ) : (
-            // Chat Messages
-            <div className="space-y-8 pb-12 w-full max-w-4xl mx-auto">
+            <div className="space-y-8 w-full py-2">
               {messages.map((message, index) => (
                 <div
                   key={message.id}
@@ -433,12 +433,12 @@ export default function TechToolAssistantPage() {
                     </div>
                   )}
 
-                  <div className={`max-w-[85%] md:max-w-[75%] space-y-3 ${message.sender === "user" ? "ml-12" : ""}`}>
+                  <div className={`flex flex-col ${message.sender === "user" ? "items-end" : "items-start"} max-w-[85%]`}>
                     <div
-                      className={`px-5 py-3.5 text-[0.95rem] leading-relaxed whitespace-pre-wrap shadow-sm ${
+                      className={`px-5 py-3 text-[0.95rem] leading-relaxed whitespace-pre-wrap shadow-sm ${
                         message.sender === "user"
-                          ? "bg-[#f0f4f9] text-[#1f1f1f] rounded-3xl rounded-tr-sm"
-                          : "text-gray-800 pt-2"
+                          ? "bg-[#f0f4f9] text-[#1f1f1f] rounded-2xl rounded-tr-sm"
+                          : "bg-white text-gray-800 rounded-2xl rounded-tl-sm border border-gray-100"
                       }`}
                     >
                       {message.sender === "bot" ? (
@@ -476,21 +476,28 @@ export default function TechToolAssistantPage() {
               {/* Loading Indicator */}
               {isSending && (
                 <div className="flex gap-4">
-                   <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 animate-pulse shadow-md border-2 border-white/50">
-                       <img src="/wizard-bot.jpg" alt="Wizard Assistant" className="w-full h-full object-cover grayscale opacity-50" />
+                   <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 animate-pulse shadow-sm border border-gray-100">
+                       <img src="/wizard-bot.jpg" alt="Wizard Assistant" className="w-full h-full object-cover" />
                     </div>
-                    <div className="pt-2 text-gray-500 animate-pulse font-medium">Wizard is thinking...</div>
+                    <div className="bg-white px-5 py-3.5 rounded-2xl rounded-tl-sm border border-gray-100 shadow-sm">
+                      <div className="flex gap-1">
+                        <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                        <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                        <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce"></span>
+                      </div>
+                    </div>
                 </div>
               )}
               
               <div ref={messagesEndRef} />
             </div>
           )}
+          </div>
         </div>
 
         {/* Input Area */}
-        <div className="p-4 w-full flex-shrink-0 lg:px-12">
-          <div className="max-w-4xl mx-auto">
+        <div className="pb-8 w-full flex-shrink-0">
+          <div className="max-w-4xl mx-auto px-4 md:px-8 w-full">
             {currentTicketId ? (
               <div className="flex items-center justify-center gap-3 bg-blue-50/50 rounded-full px-6 py-4 border border-blue-100 mb-2 animate-in fade-in duration-500">
                 <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center flex-shrink-0 animate-bounce">

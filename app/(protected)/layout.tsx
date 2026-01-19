@@ -33,7 +33,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
   return (
     <div className="min-h-screen">
       <AppHeader userName={userName} userImage={userImage} />
-      <main className="w-full px-8 py-8">{children}</main>
+      <main className="w-full">{children}</main>
     </div>
   );
 }

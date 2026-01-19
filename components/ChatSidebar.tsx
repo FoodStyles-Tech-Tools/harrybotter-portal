@@ -121,7 +121,7 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
   };
 
   return (
-    <div className="w-64 h-full bg-[#f0f4f9] flex flex-col flex-shrink-0 z-20 font-outfit border-r border-gray-200/50">
+    <div className="w-80 h-full bg-[#f0f4f9] flex flex-col flex-shrink-0 z-20 font-outfit border-r border-gray-200/50">
       {/* New Chat Button Area */}
       <div className="p-4">
         <button

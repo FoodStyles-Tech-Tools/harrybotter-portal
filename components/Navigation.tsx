@@ -11,7 +11,7 @@ export default function Navigation({ activeTab }: NavigationProps) {
   return (
     <nav className="flex gap-2 flex-wrap">
       <Link
-        href="/techtool-assistant"
+        href="/chat"
         className={`${baseClasses} ${
           activeTab === 'assistant'
             ? 'bg-blue-600 border-blue-600 text-white shadow-md'

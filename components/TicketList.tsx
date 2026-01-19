@@ -379,15 +379,16 @@ export default function TicketList({
           <div className="overflow-x-auto">
             <table className="w-full">
               <colgroup>
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '22%' }} />
+                <col style={{ width: '9%' }} />
+                <col style={{ width: '9%' }} />
+                <col style={{ width: '9%' }} />
                 <col style={{ width: '8%' }} />
-                <col style={{ width: '25%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '10%' }} />
                 <col style={{ width: '8%' }} />
-                <col style={{ width: '8%' }} />
+                <col style={{ width: '9%' }} />
                 <col style={{ width: '10%' }} />
-                <col style={{ width: '11%' }} />
+                <col style={{ width: '9%' }} />
               </colgroup>
               <thead className="bg-[#f8fafd] border-b border-gray-100">
                 <tr>
@@ -415,6 +416,9 @@ export default function TicketList({
                   <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                     Status
                   </th>
+                  <th className="px-3 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                    Deadline
+                  </th>
                   <th className="px-4 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                     Created
                   </th>
@@ -423,7 +427,7 @@ export default function TicketList({
               <tbody className="divide-y divide-gray-200">
                   {paginatedTickets.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
+                      <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
                         No tickets found matching your filters.
                       </td>
                     </tr>
@@ -547,7 +551,17 @@ export default function TicketList({
                           </td>
                           <td className="px-3 py-3 text-sm text-gray-600 break-words">
                             {(() => {
-                              const { formatted, relative } = formatDate(ticket.createdAt);
+                              const { formatted } = formatDate(ticket.due_date || '');
+                              return (
+                                <div className="space-y-0.5">
+                                  <div className="break-words font-medium text-amber-600">{formatted}</div>
+                                </div>
+                              );
+                            })()}
+                          </td>
+                          <td className="px-3 py-3 text-sm text-gray-600 break-words">
+                            {(() => {
+                              const { formatted, relative } = formatDate(ticket.created_at || '');
                               return (
                                 <div className="space-y-0.5">
                                   <div className="break-words">{formatted}</div>
