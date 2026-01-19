@@ -471,8 +471,8 @@ export default function TicketList({
                       <td className="px-4 py-5 align-middle text-center">
                         <div className="flex items-center justify-center gap-2">
                           <div className={`w-2 h-2 rounded-full ${
-                            ticket.priority === 'Urgent' ? 'bg-rose-500 animate-pulse' :
-                            ticket.priority === 'High' ? 'bg-blue-600' :
+                            ticket.priority === 'Urgent' ? 'bg-red-500 animate-pulse' :
+                            ticket.priority === 'High' ? 'bg-orange-500' :
                             ticket.priority === 'Medium' ? 'bg-blue-500' :
                             'bg-slate-300'
                           }`} />
