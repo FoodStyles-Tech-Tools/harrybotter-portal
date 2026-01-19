@@ -73,15 +73,17 @@ export default function SubmitTicketPage() {
 
   return (
     <>
-      <div className="flex-1 w-full px-4 md:px-10 py-4 flex flex-col">
-        <div className="glass-panel rounded-[2rem] p-1 md:p-2 border border-white/60 shadow-[0_20px_60px_-40px_rgba(37,99,235,0.35)]">
-          <TicketForm
-            onSubmit={handleTicketSubmit}
-            currentUser={currentUser}
-            initialTeamMembers={teamMembers}
-            initialProjects={projects}
-            isLoading={isLoading}
-          />
+      <div className="w-full px-4 md:px-10 py-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="glass-panel rounded-[2rem] p-1 md:p-2 border border-white/60 shadow-[0_20px_60px_-40px_rgba(37,99,235,0.35)]">
+            <TicketForm
+              onSubmit={handleTicketSubmit}
+              currentUser={currentUser}
+              initialTeamMembers={teamMembers}
+              initialProjects={projects}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
       </div>
       <ToastContainer toasts={toasts} onClose={removeToast} />

@@ -358,6 +358,7 @@ export default function TicketList({
               setCurrentPage(1);
             }}
             allowClear
+            showAvatar={false}
           />
         </div>
         <div className="space-y-2">
@@ -371,6 +372,7 @@ export default function TicketList({
               setCurrentPage(1);
             }}
             allowClear
+            showAvatar={false}
           />
         </div>
         <div className="space-y-2">
@@ -384,6 +386,7 @@ export default function TicketList({
               setCurrentPage(1);
             }}
             allowClear
+            showAvatar={false}
           />
         </div>
         <div className="space-y-2">
@@ -397,6 +400,7 @@ export default function TicketList({
               setCurrentPage(1);
             }}
             allowClear
+            showAvatar={false}
           />
         </div>
       </div>

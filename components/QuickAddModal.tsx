@@ -153,9 +153,10 @@ export default function QuickAddModal() {
         onClick={() => setIsOpen(false)}
       />
       
-      <div className="relative w-full max-w-2xl glass-panel bg-white rounded-[2rem] border border-white/60 shadow-2xl overflow-hidden transition-all duration-300 transform scale-100 opacity-100">
-        <div className="p-6 sm:p-8">
-          <div className="flex items-center justify-between mb-8">
+      <div className="relative w-full max-w-2xl max-h-[90vh] glass-panel bg-white rounded-[2rem] border border-white/60 shadow-2xl overflow-hidden transition-all duration-300 transform scale-100 opacity-100 flex flex-col">
+        {/* Fixed Header */}
+        <div className="flex-shrink-0 p-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-white/40">
+          <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Create New Ticket</h2>
             <button 
               onClick={() => setIsOpen(false)}
@@ -164,7 +165,10 @@ export default function QuickAddModal() {
               <Icons.Close className="w-5 h-5" />
             </button>
           </div>
+        </div>
 
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6 sm:px-8 sm:py-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Type Selection */}
             <div className="grid grid-cols-2 gap-3">
@@ -229,6 +233,7 @@ export default function QuickAddModal() {
                   value={project?.id}
                   onSelect={setProject}
                   allowClear
+                  showAvatar={false}
                   className="!h-[42px] !rounded-xl"
                 />
               </div>
@@ -240,6 +245,7 @@ export default function QuickAddModal() {
                   value={assignee?.id}
                   onSelect={setAssignee}
                   allowClear
+                  showAvatar={false}
                   className="!h-[42px] !rounded-xl"
                 />
               </div>
@@ -281,7 +287,8 @@ export default function QuickAddModal() {
           </form>
         </div>
 
-        <div className="p-5 bg-white/40 border-t border-white/60 flex justify-end">
+        {/* Fixed Footer */}
+        <div className="flex-shrink-0 p-5 bg-white/40 border-t border-white/60 flex justify-end">
           <button
             type="button"
             onClick={handleSubmit}

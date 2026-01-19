@@ -18,6 +18,7 @@ interface SearchableDropdownProps {
   allowClear?: boolean;
   isLoading?: boolean;
   className?: string;
+  showAvatar?: boolean;
 }
 
 export default function SearchableDropdown({
@@ -28,6 +29,7 @@ export default function SearchableDropdown({
   allowClear = false,
   isLoading = false,
   className = '',
+  showAvatar = true,
 }: SearchableDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -154,29 +156,31 @@ export default function SearchableDropdown({
                     : 'bg-white/80 text-slate-800 hover:bg-white hover:text-slate-900 shadow-sm'
                 }`}
               >
-                {option.avatar_url && !(failedAvatars[String(option.id ?? option.name)] ?? false) ? (
-                  <div className={`relative flex-shrink-0 ${highlightedIndex === index ? 'ring-2 ring-white/30' : ''} rounded-full`}>
-                    <Image
-                      src={option.avatar_url}
-                      alt={option.name}
-                      width={28}
-                      height={28}
-                      unoptimized
-                      className="w-7 h-7 rounded-full object-cover"
-                      onError={() => {
-                        const key = String(option.id ?? option.name);
-                        setFailedAvatars((prev) => ({ ...prev, [key]: true }));
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 transition-colors ${
-                    highlightedIndex === index 
-                      ? 'bg-white/20 text-white' 
-                      : 'bg-blue-50 text-blue-600'
-                  }`}>
-                    {option.name.charAt(0).toUpperCase()}
-                  </div>
+                {showAvatar && (
+                  option.avatar_url && !(failedAvatars[String(option.id ?? option.name)] ?? false) ? (
+                    <div className={`relative flex-shrink-0 ${highlightedIndex === index ? 'ring-2 ring-white/30' : ''} rounded-full`}>
+                      <Image
+                        src={option.avatar_url}
+                        alt={option.name}
+                        width={28}
+                        height={28}
+                        unoptimized
+                        className="w-7 h-7 rounded-full object-cover"
+                        onError={() => {
+                          const key = String(option.id ?? option.name);
+                          setFailedAvatars((prev) => ({ ...prev, [key]: true }));
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 transition-colors ${
+                      highlightedIndex === index 
+                        ? 'bg-white/20 text-white' 
+                        : 'bg-blue-50 text-blue-600'
+                    }`}>
+                      {option.name.charAt(0).toUpperCase()}
+                    </div>
+                  )
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-normal truncate leading-tight">{option.name}</div>

@@ -404,6 +404,7 @@ export default function TicketForm({
             onSelect={handleProjectSelect}
             allowClear
             isLoading={isLoading}
+            showAvatar={false}
           />
         </div>
         <div>
@@ -417,6 +418,7 @@ export default function TicketForm({
             onSelect={(value) => updateState({ assignee: value })}
             allowClear
             isLoading={isLoading}
+            showAvatar={false}
           />
         </div>
       </div>
