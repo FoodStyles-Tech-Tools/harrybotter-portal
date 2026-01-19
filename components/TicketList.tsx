@@ -453,18 +453,18 @@ export default function TicketList({
                           <div className={`p-2 rounded-lg ${ticket.type === 'Bug' ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'}`}>
                             {ticket.type === 'Bug' ? <Icons.Bug className="w-4 h-4" /> : <Icons.Request className="w-4 h-4" />}
                           </div>
-                          <span className="text-sm font-light text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
+                          <span className="text-sm font-normal text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
                             {ticket.display_id || (ticket.id.startsWith('HRB-') ? ticket.id : `HRB-${ticket.id}`)}
                           </span>
                         </div>
                       </td>
                       <td className="px-4 py-5 align-middle">
-                        <p className="text-sm font-light text-slate-700 group-hover:text-slate-900 transition-colors break-words">
+                        <p className="text-sm font-normal text-slate-700 group-hover:text-slate-900 transition-colors break-words">
                           {highlightText(ticket.title, searchFilter)}
                         </p>
                       </td>
                       <td className="px-4 py-5 align-middle text-center">
-                        <span className={`inline-flex px-3 py-1 rounded-lg text-xs font-light ${STATUS_COLORS[ticket.status]?.bg || 'bg-slate-50'} ${STATUS_COLORS[ticket.status]?.text || 'text-slate-600'} border border-white/20 shadow-sm`}>
+                        <span className={`inline-flex px-3 py-1 rounded-lg text-xs font-normal ${STATUS_COLORS[ticket.status]?.bg || 'bg-slate-50'} ${STATUS_COLORS[ticket.status]?.text || 'text-slate-600'} border border-white/20 shadow-sm`}>
                           {ticket.status}
                         </span>
                       </td>
@@ -476,7 +476,7 @@ export default function TicketList({
                             ticket.priority === 'Medium' ? 'bg-blue-500' :
                             'bg-slate-300'
                           }`} />
-                          <span className="text-xs font-light text-slate-600">
+                          <span className="text-xs font-normal text-slate-600">
                             {ticket.priority}
                           </span>
                         </div>
@@ -503,15 +503,15 @@ export default function TicketList({
                               {ticket.requestedBy?.charAt(0) || 'U'}
                             </div>
                           )}
-                          <span className="text-sm font-light text-slate-700 truncate max-w-[120px]">
+                          <span className="text-sm font-normal text-slate-700 truncate max-w-[120px]">
                             {ticket.requestedBy}
                           </span>
                         </div>
                       </td>
                       <td className="pr-8 px-4 py-5 align-middle">
                         <div className="flex flex-col text-left">
-                          <p className="text-xs font-light text-slate-900">{formatDate(ticket.created_at || '').formatted}</p>
-                          <p className="text-[10px] font-light text-slate-400">{formatDate(ticket.created_at || '').relative}</p>
+                          <p className="text-xs font-normal text-slate-900">{formatDate(ticket.created_at || '').formatted}</p>
+                          <p className="text-[10px] font-normal text-slate-400">{formatDate(ticket.created_at || '').relative}</p>
                         </div>
                       </td>
                     </tr>

@@ -113,7 +113,7 @@ export default function GlobalTicketSearch() {
           <span className="text-[10px] uppercase tracking-[0.25em] text-slate-400">
             Search Tickets
           </span>
-          <kbd className="ml-auto inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">
+          <kbd className="ml-auto inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-normal text-slate-600 shadow-sm">
             /
           </kbd>
         </div>
@@ -123,17 +123,17 @@ export default function GlobalTicketSearch() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Type ticket ID, summary, or reporter..."
-            className="w-full h-12 px-4 text-sm glass-input rounded-xl font-light text-slate-700 placeholder:text-slate-400"
+            className="w-full h-12 px-4 text-sm glass-input rounded-xl font-normal text-slate-700 placeholder:text-slate-400"
           />
         </div>
         <div className="max-h-80 overflow-y-auto px-3 pb-4">
           {isLoading ? (
-            <div className="px-3 py-6 text-center text-xs font-light text-slate-400">
+            <div className="px-3 py-6 text-center text-xs font-normal text-slate-400">
               Loading tickets...
             </div>
           ) : query.trim().length === 0 ? (
             recentTickets.length === 0 ? (
-              <div className="px-3 py-6 text-center text-xs font-light text-slate-400">
+              <div className="px-3 py-6 text-center text-xs font-normal text-slate-400">
                 Start typing to search tickets.
               </div>
             ) : (
@@ -150,9 +150,9 @@ export default function GlobalTicketSearch() {
                       router.push(`/tickets?ticket=${encodeURIComponent(String(target))}`);
                       setIsOpen(false);
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-light text-slate-700 hover:bg-white/80 transition-all"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-normal text-slate-700 hover:bg-white/80 transition-all"
                   >
-                    <span className="text-xs text-blue-600 font-light">
+                    <span className="text-xs text-blue-600 font-normal">
                       {ticket.display_id || ticket.id}
                     </span>
                     <span className="flex-1 break-words">{ticket.title}</span>
@@ -162,7 +162,7 @@ export default function GlobalTicketSearch() {
               </div>
             )
           ) : results.length === 0 ? (
-            <div className="px-3 py-6 text-center text-xs font-light text-slate-400">
+            <div className="px-3 py-6 text-center text-xs font-normal text-slate-400">
               No matching tickets.
             </div>
           ) : (
@@ -175,9 +175,9 @@ export default function GlobalTicketSearch() {
                   router.push(`/tickets?ticket=${encodeURIComponent(String(target))}`);
                   setIsOpen(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-light text-slate-700 hover:bg-white/80 transition-all"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-normal text-slate-700 hover:bg-white/80 transition-all"
               >
-                <span className="text-xs text-blue-600 font-light">
+                <span className="text-xs text-blue-600 font-normal">
                   {ticket.display_id || ticket.id}
                 </span>
                 <span className="flex-1 break-words">{ticket.title}</span>

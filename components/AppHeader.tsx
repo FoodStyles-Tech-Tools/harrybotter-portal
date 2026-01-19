@@ -41,6 +41,13 @@ const Icons = {
       <path d="M3 18h.01" />
     </svg>
   ),
+  Archive: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="3" y="4" width="18" height="4" rx="1" />
+      <path d="M4 8v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+      <path d="M10 12h4" />
+    </svg>
+  ),
   Logout: (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -75,6 +82,7 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
   const navItems = [
     { href: '/chat', label: 'Chat', icon: Icons.Chat },
     { href: '/tickets', label: 'Ticket', icon: Icons.List },
+    { href: '/assets', label: 'Assets', icon: Icons.Archive },
   ];
 
   const initials = userName
@@ -208,24 +216,24 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
                 </svg>
               </button>
             </div>
-            <div className="px-5 py-5 space-y-3 text-[12px] text-slate-600 font-light">
+            <div className="px-5 py-5 space-y-3 text-[12px] text-slate-600 font-normal">
               <div className="flex items-center justify-between">
                 <span>New chat (Chat page)</span>
                 <div className="flex items-center gap-1">
-                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">Alt</kbd>
-                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">N</kbd>
+                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-normal text-slate-600 shadow-sm">Alt</kbd>
+                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-normal text-slate-600 shadow-sm">N</kbd>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <span>New chat (Mac)</span>
                 <div className="flex items-center gap-1">
-                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">⌥</kbd>
-                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">N</kbd>
+                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-normal text-slate-600 shadow-sm">⌥</kbd>
+                  <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-normal text-slate-600 shadow-sm">N</kbd>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <span>Search tickets</span>
-                <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-light text-slate-600 shadow-sm">/</kbd>
+                <kbd className="inline-flex h-6 items-center rounded-md border border-white/70 bg-white/80 px-2 text-[10px] font-normal text-slate-600 shadow-sm">/</kbd>
               </div>
             </div>
           </div>

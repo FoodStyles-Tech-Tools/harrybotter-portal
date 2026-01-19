@@ -132,7 +132,7 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
       <div className="p-6">
         <button
           onClick={onNewChat}
-          className="w-full flex items-center gap-3 px-4 py-3 bg-slate-100 text-slate-600 rounded-xl text-sm font-light border border-slate-200 shadow-sm"
+          className="w-full flex items-center gap-3 px-4 py-3 bg-slate-100 text-slate-600 rounded-xl text-sm font-normal border border-slate-200 shadow-sm"
         >
           <Icons.Edit className="w-4 h-4 text-slate-500" />
           New chat
@@ -175,10 +175,10 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
                   }`}
                 >
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="truncate font-light">
-                      {session.ticket_id || session.title || 'Untitled Session'}
-                    </span>
-                    <span className={`text-[10px] font-light ${currentSessionId === session.id ? 'text-blue-600/70' : 'text-slate-400'}`}>
+<span className="truncate font-normal">
+                                      {session.ticket_id || session.title || 'Untitled Session'}
+                                    </span>
+                                    <span className={`text-[10px] font-normal ${currentSessionId === session.id ? 'text-blue-600/70' : 'text-slate-400'}`}>
                       {formatRelativeTime(session.updated_at)}
                     </span>
                   </div>

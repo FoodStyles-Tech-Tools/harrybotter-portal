@@ -1,13 +1,6 @@
 import type { Metadata } from 'next';
-import { Open_Sans } from 'next/font/google';
 import './globals.css';
 import { SWRProvider } from '@/lib/swr-config';
-
-const openSans = Open_Sans({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-open-sans',
-});
 
 export const metadata: Metadata = {
   title: 'HarryBotter Portal - Tech Tools',
@@ -29,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={openSans.variable}>
+    <html lang="en">
       <body className="font-sans">
         <SWRProvider>{children}</SWRProvider>
       </body>
