@@ -193,6 +193,7 @@ export default function TechToolAssistantPage() {
   const [feedbackText, setFeedbackText] = useState("");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [hasSubmittedFeedback, setHasSubmittedFeedback] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const skipNextHistoryLoad = useRef(false);
 
@@ -238,6 +239,7 @@ export default function TechToolAssistantPage() {
     setRating(0);
     setFeedbackText("");
     setHasSubmittedFeedback(false);
+    setIsFeedbackOpen(true);
 
     const fetchFeedback = async () => {
       if (!currentSessionId || !currentTicketId) return;
@@ -249,6 +251,7 @@ export default function TechToolAssistantPage() {
             setHasSubmittedFeedback(true);
             setRating(Number(data[0].rating) || 0);
             setFeedbackText(data[0].feedback || "");
+            setIsFeedbackOpen(false);
           }
         }
       } catch (error) {
@@ -442,6 +445,7 @@ export default function TechToolAssistantPage() {
     setRating(0);
     setFeedbackText("");
     setHasSubmittedFeedback(false);
+    setIsFeedbackOpen(true);
   };
 
   useEffect(() => {
@@ -645,48 +649,63 @@ export default function TechToolAssistantPage() {
                 </div>
 
                 <div className="glass-panel rounded-2xl px-6 py-4 border-blue-200/50">
-                  <div className="flex flex-col gap-3">
-                    <p className="text-sm font-semibold text-slate-900">help us improve your feedback matters</p>
-                    <div className="flex items-center gap-2">
-                      {[1, 2, 3, 4, 5].map((value) => (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => setRating(value)}
-                          disabled={hasSubmittedFeedback || isSubmittingFeedback}
-                          aria-label={`Rate ${value} star${value === 1 ? "" : "s"}`}
-                          className={`p-1.5 rounded-full transition-all ${
-                            value <= rating ? "text-yellow-500" : "text-slate-300"
-                          } ${hasSubmittedFeedback ? "cursor-default" : "hover:scale-105"}`}
-                        >
-                          <Icons.Star className="w-6 h-6" />
-                        </button>
-                      ))}
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">
-                        {rating > 0 ? `${rating} / 5` : "Rate 1-5"}
-                      </span>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex flex-col">
+                      <p className="text-sm font-semibold text-slate-900">help us to improve, your feedback matters</p>
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em]">This chat has been locked</p>
                     </div>
-                    <textarea
-                      value={feedbackText}
-                      onChange={(event) => setFeedbackText(event.target.value)}
-                      placeholder="Share feedback"
-                      rows={3}
-                      disabled={hasSubmittedFeedback || isSubmittingFeedback}
-                      className="w-full rounded-2xl border border-blue-100/80 bg-white/70 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-blue-300"
-                    />
-                    {hasSubmittedFeedback ? (
-                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">Thanks for the feedback</p>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={handleSubmitFeedback}
-                        disabled={rating === 0 || isSubmittingFeedback}
-                        className="self-start px-5 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold shadow-md shadow-blue-200 hover:bg-blue-700 hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:bg-slate-400 disabled:shadow-none"
-                      >
-                        {isSubmittingFeedback ? "Submitting..." : "Submit Feedback"}
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsFeedbackOpen((prev) => !prev)}
+                      className="px-4 py-2 text-xs font-semibold rounded-xl glass-button text-slate-500 hover:text-blue-600 transition-all"
+                    >
+                      {isFeedbackOpen ? "Hide" : "Show"} feedback
+                    </button>
                   </div>
+
+                  {isFeedbackOpen && (
+                    <div className="flex flex-col gap-3 mt-4">
+                      <div className="flex items-center gap-2">
+                        {[1, 2, 3, 4, 5].map((value) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => setRating(value)}
+                            disabled={hasSubmittedFeedback || isSubmittingFeedback}
+                            aria-label={`Rate ${value} star${value === 1 ? "" : "s"}`}
+                            className={`p-1.5 rounded-full transition-all ${
+                              value <= rating ? "text-yellow-500" : "text-slate-300"
+                            } ${hasSubmittedFeedback ? "cursor-default" : "hover:scale-105"}`}
+                          >
+                            <Icons.Star className="w-6 h-6" />
+                          </button>
+                        ))}
+                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">
+                          {rating > 0 ? `${rating} / 5` : "Rate 1-5"}
+                        </span>
+                      </div>
+                      <textarea
+                        value={feedbackText}
+                        onChange={(event) => setFeedbackText(event.target.value)}
+                        placeholder="Share feedback"
+                        rows={3}
+                        disabled={hasSubmittedFeedback || isSubmittingFeedback}
+                        className="w-full rounded-2xl border border-blue-100/80 bg-white/70 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-blue-300"
+                      />
+                      {hasSubmittedFeedback ? (
+                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">Thanks for the feedback</p>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={handleSubmitFeedback}
+                          disabled={rating === 0 || isSubmittingFeedback}
+                          className="self-start px-5 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold shadow-md shadow-blue-200 hover:bg-blue-700 hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:bg-slate-400 disabled:shadow-none"
+                        >
+                          {isSubmittingFeedback ? "Submitting..." : "Submit Feedback"}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
