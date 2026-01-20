@@ -12,9 +12,12 @@ export default function CheckTicketPage() {
   const requesterName = useMemo(() => sessionState?.data?.user?.name ?? null, [sessionState?.data?.user?.name]);
 
   useEffect(() => {
+    const idParam = searchParams.get('id');
     const ticketParam = searchParams.get('ticket');
-    if (ticketParam) {
-      const normalized = ticketParam.replace(/^HRB-/i, '');
+    const targetParam = idParam || ticketParam;
+    
+    if (targetParam) {
+      const normalized = targetParam.replace(/^HRB-/i, '');
       setInitialTicketId(normalized);
     } else {
       setInitialTicketId(null);
@@ -22,11 +25,14 @@ export default function CheckTicketPage() {
   }, [searchParams]);
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Ticket Overview</h2>
+    <div className="flex-1 w-full flex flex-col">
+      <div className="flex-1 bg-white/10 backdrop-blur-md overflow-hidden">
+        <TicketList 
+          initialTicketIdFilter={initialTicketId} 
+          initialRequesterName={requesterName}
+        />
       </div>
-      <TicketList initialTicketIdFilter={initialTicketId ?? undefined} initialRequesterName={requesterName ?? undefined} />
     </div>
   );
 }
+

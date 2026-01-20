@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="font-sans">
         <SWRProvider>{children}</SWRProvider>
       </body>
     </html>

@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import AppHeader from '@/components/AppHeader';
+import GlobalTicketSearch from '@/components/GlobalTicketSearch';
+import QuickAddModal from '@/components/QuickAddModal';
 import { getBetterAuthSession, hasBetterAuthSessionCookie } from '@/lib/server-session';
 
 export const runtime = 'nodejs';
@@ -31,10 +33,11 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
   const userName = typeof session.user?.name === 'string' ? (session.user.name as string) : undefined;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <AppHeader userName={userName} userImage={userImage} />
-      <main className="w-full px-8 py-8">{children}</main>
+      <main className="w-full">{children}</main>
+      <QuickAddModal />
+      <GlobalTicketSearch />
     </div>
   );
 }
-

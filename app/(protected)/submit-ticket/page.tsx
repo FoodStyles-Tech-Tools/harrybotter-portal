@@ -61,9 +61,9 @@ export default function SubmitTicketPage() {
 
       const firstTicketId = data.ticketIds?.[0];
       if (firstTicketId) {
-        router.push(`/check-ticket?ticket=${firstTicketId}`);
+        router.push(`/tickets?ticket=${firstTicketId}`);
       } else {
-        router.push('/check-ticket');
+        router.push('/tickets');
       }
     } catch (err: any) {
       error(err.message || 'Failed to submit ticket(s). Please try again.');
@@ -73,20 +73,18 @@ export default function SubmitTicketPage() {
 
   return (
     <>
-      <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Submit New Tickets</h2>
-          <p className="text-sm text-gray-600">
-            Use this section to request features, report bugs, or ask for assistance. Add multiple tickets easily using the &apos;+&apos; button in each row.
-          </p>
+      <div className="w-full px-4 md:px-10 py-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="glass-panel rounded-[2rem] p-1 md:p-2 border border-white/60 shadow-[0_20px_60px_-40px_rgba(37,99,235,0.35)]">
+            <TicketForm
+              onSubmit={handleTicketSubmit}
+              currentUser={currentUser}
+              initialTeamMembers={teamMembers}
+              initialProjects={projects}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
-        <TicketForm
-          onSubmit={handleTicketSubmit}
-          currentUser={currentUser}
-          initialTeamMembers={teamMembers}
-          initialProjects={projects}
-          isLoading={isLoading}
-        />
       </div>
       <ToastContainer toasts={toasts} onClose={removeToast} />
     </>

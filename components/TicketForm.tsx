@@ -1,8 +1,17 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import SearchableDropdown, { DropdownOption } from './SearchableDropdown';
 import type { TeamMember, Project, TicketFormData } from '@/types';
+
+const Icons = {
+  Plus: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
+  ),
+};
 
 const TYPE_OPTIONS = [
   {
@@ -41,7 +50,7 @@ const PRIORITY_OPTIONS = [
     label: 'Medium',
     icon: () => (
       <div className="w-4 h-4 flex items-center justify-center">
-        <div className="w-3 h-0.5 bg-yellow-500 rounded-sm" />
+        <div className="w-3 h-0.5 bg-blue-400 rounded-sm" />
       </div>
     ),
   },
@@ -154,7 +163,7 @@ export default function TicketForm({
     }
   }, [isRephrasing]);
 
-  const updateState = (updates: Partial<{
+  const updateState = useCallback((updates: Partial<{
     project: DropdownOption | null;
     assignee: DropdownOption | null;
     tickets: TicketFormData[];
@@ -170,7 +179,7 @@ export default function TicketForm({
       if (updates.assignee !== undefined) setLocalAssignee(updates.assignee);
       if (updates.tickets !== undefined) setLocalTickets(updates.tickets);
     }
-  };
+  }, [onFormStateChange, project, assignee, tickets]);
 
 
   const addTicketRow = () => {
@@ -382,10 +391,10 @@ export default function TicketForm({
   }, [project?.id, initialProjects, assigneeOptions, assignee, updateState]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 glass-panel rounded-[1.5rem] border border-white/40 shadow-sm">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-slate-700 mb-1 ml-1">
             Project (Optional)
           </label>
           <SearchableDropdown
@@ -395,10 +404,11 @@ export default function TicketForm({
             onSelect={handleProjectSelect}
             allowClear
             isLoading={isLoading}
+            showAvatar={false}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-slate-700 mb-1 ml-1">
             Assignee (Optional)
           </label>
           <SearchableDropdown
@@ -408,42 +418,41 @@ export default function TicketForm({
             onSelect={(value) => updateState({ assignee: value })}
             allowClear
             isLoading={isLoading}
+            showAvatar={false}
           />
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Tickets</h3>
+          <h3 className="text-base font-semibold text-slate-900">Tickets</h3>
           <button
             type="button"
             onClick={addTicketRow}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-blue-600 bg-white/70 border border-blue-100/70 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm hover:shadow-blue-100 active:scale-[0.98] backdrop-blur-sm group"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <Icons.Plus className="w-3.5 h-3.5 transition-transform group-hover:rotate-90" />
             Add Row
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-hidden rounded-[1.5rem] border border-white/40 shadow-sm bg-white/25 backdrop-blur-sm">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">
+              <tr className="bg-white/40 border-b border-white/40">
+                <th className="px-4 py-2 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
                   Details *
                 </th>
-                <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold text-gray-700" style={{ width: '14%' }}>
-                  Expected Done Date
+                <th className="px-2 py-2 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '14%' }}>
+                  Expected Done
                 </th>
-                <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold text-gray-700" style={{ width: '12%' }}>
+                <th className="px-2 py-2 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '12%' }}>
                   Type
                 </th>
-                <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold text-gray-700" style={{ width: '12%' }}>
+                <th className="px-2 py-2 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.2em]" style={{ width: '12%' }}>
                   Priority
                 </th>
-                <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-700 w-20">
+                <th className="px-3 py-2 text-center text-xs font-bold text-slate-400 uppercase tracking-[0.2em] w-20">
                   Actions
                 </th>
               </tr>
@@ -452,66 +461,64 @@ export default function TicketForm({
               {tickets.map((ticket, index) => (
                 <tr
                   key={index}
-                  className="hover:bg-gray-50"
+                  className="hover:bg-white/40 transition-colors"
                 >
-                  <td className="border border-gray-300 px-3 py-2">
-                    <div className="space-y-2">
+                  <td className="px-3 py-2">
+                    <div className="space-y-1.5">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Ticket *</label>
+                        <label className="block text-xs font-medium text-slate-700 mb-0.5">Ticket *</label>
                         <textarea
                           value={ticket.title}
                           onChange={(e) => updateTicket(index, 'title', e.target.value)}
                           placeholder="Task title..."
                           required
-                          rows={2}
-                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                          rows={1}
+                          className="w-full px-2.5 py-1 text-[0.9rem] bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition-all resize-none shadow-sm font-medium"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
-                        <div className="border border-blue-200 rounded p-2 bg-blue-50">
+                        <label className="block text-xs font-medium text-slate-400 mb-0.5 ml-1">Description</label>
+                        <div className="border border-white/50 rounded-xl p-2 bg-white/30 shadow-sm group focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:bg-white/70 transition-all">
                           <textarea
                             data-ticket-index={index}
                             data-field="description"
                             value={ticket.description}
                             onChange={(e) => {
                               updateTicket(index, 'description', e.target.value);
-                              // Auto-grow functionality
                               e.target.style.height = 'auto';
                               e.target.style.height = `${e.target.scrollHeight}px`;
                             }}
                             onInput={(e) => {
-                              // Auto-grow on input
                               const target = e.target as HTMLTextAreaElement;
                               target.style.height = 'auto';
                               target.style.height = `${target.scrollHeight}px`;
                             }}
                             placeholder="Describe the task in detail..."
-                            rows={3}
-                            className="w-full px-2 py-1 text-sm border-0 bg-transparent focus:outline-none focus:ring-0 resize-none min-h-[60px]"
+                            rows={2}
+                            className="w-full px-2 py-0.5 text-[0.85rem] border-0 bg-transparent focus:outline-none focus:ring-0 resize-none min-h-[30px] leading-relaxed text-slate-600"
                             style={{ overflow: 'hidden' }}
                           />
-                          <div className="flex justify-end mt-2">
+                          <div className="flex justify-end mt-1.5">
                             <button
                               type="button"
                               onClick={() => handleRephrase(index)}
                               disabled={isRephrasing || !ticket.description?.trim()}
-                              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                              className="group flex items-center gap-1.5 px-2.5 py-1 text-[0.65rem] font-bold text-blue-600 bg-blue-50/70 border border-blue-100 rounded-lg hover:bg-blue-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-wider"
                             >
                               {isRephrasing && rephrasingIndex === index ? (
                                 <>
-                                  <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+                                  <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                   </svg>
-                                  Rephrasing...
+                                  <span>Wizard thinking...</span>
                                 </>
                               ) : (
                                 <>
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                   </svg>
-                                  <span>Rephrase &amp; Refine</span>
+                                  <span>Rephrase with Wizard</span>
                                 </>
                               )}
                             </button>
@@ -519,31 +526,31 @@ export default function TicketForm({
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Url</label>
+                        <label className="block text-xs font-medium text-slate-400 mb-0.5 ml-1">Url (Optional)</label>
                         <input
                           type="url"
                           value={ticket.url || ''}
                           onChange={(e) => updateTicket(index, 'url', e.target.value)}
                           placeholder="https://..."
-                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-2.5 py-1.5 text-sm bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm"
                         />
                       </div>
                       {rephraseResult && rephrasingIndex === index && (
                         <div
-                          className="p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                          className="p-2 bg-blue-50/80 border border-blue-200 rounded-lg"
                         >
-                          <div className="space-y-2">
+                          <div className="space-y-1.5">
                             <div>
-                              <p className="text-xs font-semibold text-gray-700 mb-1">Task Name:</p>
-                              <p className="text-sm text-gray-900">{rephraseResult.taskName}</p>
+                              <p className="text-xs font-semibold text-slate-700 mb-1">Task Name:</p>
+                              <p className="text-sm text-slate-900">{rephraseResult.taskName}</p>
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-gray-700 mb-1">Description:</p>
-                              <p className="text-sm text-gray-900">{rephraseResult.description}</p>
+                              <p className="text-xs font-semibold text-slate-700 mb-1">Description:</p>
+                              <p className="text-sm text-slate-900">{rephraseResult.description}</p>
                             </div>
                             {rephraseResult.url && rephraseResult.url.trim() && (
                               <div>
-                                <p className="text-xs font-semibold text-gray-700 mb-1">URL:</p>
+                                <p className="text-xs font-semibold text-slate-700 mb-1">URL:</p>
                                 <p className="text-sm text-blue-600 break-all">
                                   <a href={rephraseResult.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
                                     {rephraseResult.url}
@@ -578,29 +585,29 @@ export default function TicketForm({
                       )}
                     </div>
                   </td>
-                  <td className="border border-gray-300 px-2 py-2" style={{ width: '14%' }}>
+                   <td className="px-2 py-2" style={{ width: '14%' }}>
                     <input
                       type="date"
                       value={ticket.expectedDoneDate ?? ''}
                       onChange={(e) => updateTicket(index, 'expectedDoneDate', e.target.value || null)}
-                      className="w-full px-1 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2 py-1.5 text-xs bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm"
                     />
                   </td>
-                  <td className="border border-gray-300 px-2 py-2" style={{ width: '12%' }}>
+                  <td className="px-2 py-2" style={{ width: '12%' }}>
                     <select
                       value={ticket.type}
                       onChange={(e) => updateTicket(index, 'type', e.target.value)}
-                      className="w-full px-1 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2 py-1.5 text-xs bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm appearance-none"
                     >
                       <option value="Request">Request</option>
                       <option value="Bug">Bug</option>
                     </select>
                   </td>
-                  <td className="border border-gray-300 px-2 py-2" style={{ width: '12%' }}>
+                  <td className="px-2 py-2" style={{ width: '12%' }}>
                     <select
                       value={ticket.priority}
                       onChange={(e) => updateTicket(index, 'priority', e.target.value)}
-                      className="w-full px-1 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2 py-1.5 text-xs bg-white/50 border border-white/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm appearance-none"
                     >
                       <option value="Urgent">Urgent</option>
                       <option value="High">High</option>
@@ -608,12 +615,12 @@ export default function TicketForm({
                       <option value="Low">Low</option>
                     </select>
                   </td>
-                  <td className="border border-gray-300 px-3 py-2 text-center">
+                  <td className="px-2 py-2 text-center">
                     <button
                       type="button"
                       onClick={() => removeTicketRow(index)}
                       disabled={tickets.length === 1}
-                      className="text-red-500 hover:text-red-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                      className="text-red-500 hover:text-red-700 disabled:text-slate-300 disabled:cursor-not-allowed"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -627,26 +634,26 @@ export default function TicketForm({
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-2">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
+          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 active:scale-[0.98]"
         >
           {isSubmitting ? (
             <>
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-              Submitting...
+              <span className="text-sm">Processing...</span>
             </>
           ) : (
             <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.8" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
-              Submit Tickets
+              <span className="text-sm">Submit Tickets</span>
             </>
           )}
         </button>

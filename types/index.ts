@@ -39,6 +39,7 @@ export interface Ticket {
   project_id?: string;
   requestedBy: string; // Mapped from requested_by_id relation
   requested_by_id?: string;
+  reporterAvatar?: string;
   priority: 'Urgent' | 'High' | 'Medium' | 'Low';
   type: 'Request' | 'Bug' | 'Task';
   status: 'Open' | 'In Progress' | 'Completed' | 'Cancelled' | 'Rejected' | 'On Hold' | 'Blocked';

@@ -2,11 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.75);
+  --glass-bg-hover: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(148, 198, 255, 0.35);
+  --glass-border-strong: rgba(120, 178, 255, 0.45);
+  --glass-blur: blur(22px);
+  --primary-blue: #2563eb;
+  --secondary-blue: #3b82f6;
+  --ice-blue: #e9f2ff;
+}
+
 @layer base {
+  :root {
+    --app-sans: ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  }
+
+  html,
+  body,
+  input,
+  textarea,
+  select,
+  button {
+    font-family: var(--app-sans);
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 
-                 'Helvetica Neue', Arial, sans-serif;
+    @apply text-slate-900 antialiased min-h-screen selection:bg-blue-100 font-sans;
+    font-weight: 400;
+    font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background:
+      radial-gradient(1200px 700px at 8% -10%, rgba(59, 130, 246, 0.18), transparent 60%),
+      radial-gradient(900px 600px at 92% -5%, rgba(147, 197, 253, 0.18), transparent 55%),
+      radial-gradient(700px 500px at 20% 110%, rgba(191, 219, 254, 0.18), transparent 60%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(233, 242, 255, 0.9) 65%, rgba(245, 250, 255, 1) 100%);
+    background-attachment: fixed;
+    background-color: #f4f8ff;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 30px 80px -60px rgba(37, 99, 235, 0.35), 0 12px 32px -24px rgba(15, 23, 42, 0.2);
+  }
+  
+  .glass-button {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(148, 198, 255, 0.35);
+    backdrop-filter: blur(16px) saturate(130%);
+    transition: all 0.3s ease;
+  }
+
+  .glass-input {
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(148, 198, 255, 0.3);
+    backdrop-filter: blur(14px) saturate(140%);
+    transition: all 0.3s ease;
+  }
+
+  .glass-button:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-strong);
+  }
+
+  .glass-input:focus {
+    background: var(--glass-bg-strong);
+    border-color: rgba(59, 130, 246, 0.45);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+    outline: none;
   }
 }
 
@@ -18,19 +86,215 @@
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full;
+  @apply bg-blue-200/50 rounded-full hover:bg-blue-300/50 transition-colors;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400;
+/* GitHub-like markdown styling */
+.markdown-body {
+  color: #1f2937;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  font-family: var(--app-sans);
+  font-weight: 400;
 }
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  color: #0f172a;
+  font-weight: 600;
+  margin: 1.2em 0 0.6em;
+}
+
+.markdown-body h1 { font-size: 1.6rem; }
+.markdown-body h2 { font-size: 1.4rem; }
+.markdown-body h3 { font-size: 1.2rem; }
+
+.markdown-body p {
+  margin: 0.6em 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 1.5rem;
+  margin: 0.5em 0;
+  list-style-position: inside;
+}
+
+.markdown-body li {
+  margin: 0.25em 0;
+}
+
+.markdown-body li::marker {
+  color: #64748b;
+}
+
+.markdown-body blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding: 0.5rem 1rem;
+  color: #475569;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  margin: 1rem 0;
+}
+
+.markdown-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.markdown-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.markdown-code {
+  font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: #eef2ff;
+  color: #1d4ed8;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.markdown-pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 0.9rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  margin: 0.8rem 0;
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8rem 0;
+  font-size: 0.9rem;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.7rem;
+}
+
+.markdown-body table th {
+  background: #f8fafc;
+  text-align: left;
+  font-weight: 600;
+}
+
+/* Rich text (HTML) styling for Docs-like readability */
+.richtext-body {
+  color: #1f2937;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  font-family: var(--app-sans);
+  font-weight: 400;
+}
+
+.richtext-body p {
+  margin: 0.6em 0;
+}
+
+.richtext-body h1,
+.richtext-body h2,
+.richtext-body h3,
+.richtext-body h4,
+.richtext-body h5,
+.richtext-body h6 {
+  color: #0f172a;
+  font-weight: 600;
+  margin: 1.2em 0 0.6em;
+}
+
+.richtext-body ul,
+.richtext-body ol {
+  padding-left: 1.5rem;
+  margin: 0.4em 0;
+  list-style-position: inside;
+}
+
+.richtext-body li {
+  margin: 0.25em 0;
+}
+
+.richtext-body li::marker {
+  color: #64748b;
+}
+
+.richtext-body ul + ul,
+.richtext-body ol + ol,
+.richtext-body ul + ol,
+.richtext-body ol + ul {
+  margin-top: 0.15em;
+}
+
+.richtext-body li > p {
+  margin: 0.2em 0;
+}
+
+.richtext-body strong {
+  font-weight: 600;
+}
+
+.richtext-body a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.richtext-body a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.markdown-clamp,
+.richtext-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.asset-row td {
+  padding-top: 0.95rem;
+  padding-bottom: 0.95rem;
+}
+
+.caption-preview {
+  position: relative;
+  max-height: 3rem;
+  overflow: hidden;
+}
+
+.caption-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.4rem;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+  pointer-events: none;
+}
+
+.asset-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
 
