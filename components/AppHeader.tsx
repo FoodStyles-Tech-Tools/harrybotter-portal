@@ -116,9 +116,7 @@ export default function AppHeader({ userName, userImage }: AppHeaderProps) {
           {/* Navigation */}
           <nav className="hidden lg:flex items-center gap-1 bg-white/50 p-1.5 rounded-2xl border border-white/40">
             {navItems.map((item) => {
-              const isActive =
-                pathname === item.href ||
-                (item.href !== '/submit-ticket' && pathname.startsWith(item.href));
+              const isActive = pathname === item.href || pathname.startsWith(item.href);
               const Icon = item.icon;
               return (
                 <Link

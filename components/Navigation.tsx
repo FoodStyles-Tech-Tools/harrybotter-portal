@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 interface NavigationProps {
-  activeTab: 'assistant' | 'submit' | 'check';
+  activeTab: 'assistant' | 'check';
 }
 
 export default function Navigation({ activeTab }: NavigationProps) {
@@ -19,16 +19,6 @@ export default function Navigation({ activeTab }: NavigationProps) {
         }`}
       >
         TechTool Assistant
-      </Link>
-      <Link
-        href="/submit-ticket"
-        className={`${baseClasses} ${
-          activeTab === 'submit'
-            ? 'bg-blue-600 border-blue-600 text-white shadow-[0_12px_30px_rgba(37,99,235,0.2)]'
-            : 'bg-white/50 border-white/60 text-blue-600 hover:bg-white/80'
-        }`}
-      >
-        Submit Ticket
       </Link>
       <Link
         href="/check-ticket"

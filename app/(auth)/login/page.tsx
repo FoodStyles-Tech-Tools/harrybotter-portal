@@ -30,7 +30,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   if (session) {
     const allowed = await isUserAllowed(session.user?.email);
     if (allowed) {
-      redirect('/submit-ticket');
+      redirect('/chat');
     } else {
       await auth.api.signOut({
         headers: headers(),
