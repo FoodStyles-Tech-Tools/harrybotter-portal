@@ -88,6 +88,11 @@ const Icons = {
       <path d="M14 15h3" />
     </svg>
   ),
+  Star: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z" />
+    </svg>
+  ),
   Plus: (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="M12 5v14M5 12h14" />
@@ -184,6 +189,10 @@ export default function TechToolAssistantPage() {
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [hasSubmittedFeedback, setHasSubmittedFeedback] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const skipNextHistoryLoad = useRef(false);
 
@@ -224,6 +233,31 @@ export default function TechToolAssistantPage() {
 
     void fetchMessages();
   }, [currentSessionId]);
+
+  useEffect(() => {
+    setRating(0);
+    setFeedbackText("");
+    setHasSubmittedFeedback(false);
+
+    const fetchFeedback = async () => {
+      if (!currentSessionId || !currentTicketId) return;
+      try {
+        const res = await fetch(`/api/chat/feedback?sessionId=${currentSessionId}&ticketId=${currentTicketId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setHasSubmittedFeedback(true);
+            setRating(Number(data[0].rating) || 0);
+            setFeedbackText(data[0].feedback || "");
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch feedback", error);
+      }
+    };
+
+    void fetchFeedback();
+  }, [currentSessionId, currentTicketId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -374,10 +408,40 @@ export default function TechToolAssistantPage() {
     void sendMessage(inputValue.trim());
   };
 
+  const handleSubmitFeedback = async () => {
+    if (!currentSessionId || !currentTicketId || rating < 1 || rating > 5) {
+      return;
+    }
+    setIsSubmittingFeedback(true);
+    try {
+      const res = await fetch('/api/chat/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: currentSessionId,
+          ticketId: currentTicketId,
+          rating,
+          feedback: feedbackText.trim(),
+        }),
+      });
+
+      if (res.ok) {
+        setHasSubmittedFeedback(true);
+      }
+    } catch (error) {
+      console.error("Failed to submit feedback", error);
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
+
   const handleNewChat = () => {
     setCurrentSessionId(null);
     setCurrentTicketId(null);
     setMessages([]);
+    setRating(0);
+    setFeedbackText("");
+    setHasSubmittedFeedback(false);
   };
 
   useEffect(() => {
@@ -559,24 +623,71 @@ export default function TechToolAssistantPage() {
         <div className="pb-10 w-full flex-shrink-0">
           <div className="max-w-4xl mx-auto px-6 md:px-12 w-full">
             {currentTicketId ? (
-              <div className="flex items-center justify-between gap-4 glass-panel rounded-2xl px-6 py-4 mb-2 border-blue-200/50">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/25">
-                    <Icons.Ticket className="w-5 h-5" />
+              <div className="space-y-3 mb-2">
+                <div className="flex items-center justify-between gap-4 glass-panel rounded-2xl px-6 py-4 border-blue-200/50">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/25">
+                      <Icons.Ticket className="w-5 h-5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em]">Ticket Created</p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        ID: <span className="text-blue-600">{currentTicketId}</span>
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em]">Ticket Created</p>
-                    <p className="text-sm font-semibold text-slate-900">
-                      ID: <span className="text-blue-600">{currentTicketId}</span>
-                    </p>
+                  <button 
+                    onClick={handleNewChat}
+                    className="px-5 py-2 glass-button text-blue-600 rounded-xl text-xs font-semibold hover:bg-blue-600 hover:text-white transition-all duration-300"
+                  >
+                    Start New Chat
+                  </button>
+                </div>
+
+                <div className="glass-panel rounded-2xl px-6 py-4 border-blue-200/50">
+                  <div className="flex flex-col gap-3">
+                    <p className="text-sm font-semibold text-slate-900">help us improve your feedback matters</p>
+                    <div className="flex items-center gap-2">
+                      {[1, 2, 3, 4, 5].map((value) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setRating(value)}
+                          disabled={hasSubmittedFeedback || isSubmittingFeedback}
+                          aria-label={`Rate ${value} star${value === 1 ? "" : "s"}`}
+                          className={`p-1.5 rounded-full transition-all ${
+                            value <= rating ? "text-yellow-500" : "text-slate-300"
+                          } ${hasSubmittedFeedback ? "cursor-default" : "hover:scale-105"}`}
+                        >
+                          <Icons.Star className="w-6 h-6" />
+                        </button>
+                      ))}
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">
+                        {rating > 0 ? `${rating} / 5` : "Rate 1-5"}
+                      </span>
+                    </div>
+                    <textarea
+                      value={feedbackText}
+                      onChange={(event) => setFeedbackText(event.target.value)}
+                      placeholder="Share feedback"
+                      rows={3}
+                      disabled={hasSubmittedFeedback || isSubmittingFeedback}
+                      className="w-full rounded-2xl border border-blue-100/80 bg-white/70 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-blue-300"
+                    />
+                    {hasSubmittedFeedback ? (
+                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">Thanks for the feedback</p>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleSubmitFeedback}
+                        disabled={rating === 0 || isSubmittingFeedback}
+                        className="self-start px-5 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold shadow-md shadow-blue-200 hover:bg-blue-700 hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:bg-slate-400 disabled:shadow-none"
+                      >
+                        {isSubmittingFeedback ? "Submitting..." : "Submit Feedback"}
+                      </button>
+                    )}
                   </div>
                 </div>
-                <button 
-                  onClick={handleNewChat}
-                  className="px-5 py-2 glass-button text-blue-600 rounded-xl text-xs font-semibold hover:bg-blue-600 hover:text-white transition-all duration-300"
-                >
-                  Start New Chat
-                </button>
               </div>
             ) : (
               <div 
