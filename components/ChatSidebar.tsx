@@ -84,6 +84,7 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [feedbackBySessionId, setFeedbackBySessionId] = useState<Record<string, boolean>>({});
 
   const fetchSessions = async () => {
     try {
@@ -91,6 +92,25 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
       if (res.ok) {
         const data = await res.json();
         setSessions(data);
+
+        const sessionIds = (data as ChatSession[]).map((session) => session.id);
+        if (sessionIds.length > 0) {
+          const feedbackRes = await fetch('/api/chat/feedback?summary=1');
+          if (feedbackRes.ok) {
+            const feedbackData = await feedbackRes.json();
+            const feedbackMap: Record<string, boolean> = {};
+            for (const entry of feedbackData || []) {
+              if (entry?.session_id) {
+                feedbackMap[entry.session_id] = true;
+              }
+            }
+            setFeedbackBySessionId(feedbackMap);
+          } else {
+            setFeedbackBySessionId({});
+          }
+        } else {
+          setFeedbackBySessionId({});
+        }
       }
     } catch (error) {
       console.error('Failed to fetch sessions', error);
@@ -175,12 +195,22 @@ export default function ChatSidebar({ currentSessionId, onSelectSession, onNewCh
                   }`}
                 >
                   <div className="flex flex-col min-w-0 flex-1">
-<span className="truncate font-normal">
-                                      {session.ticket_id || session.title || 'Untitled Session'}
-                                    </span>
-                                    <span className={`text-[10px] font-normal ${currentSessionId === session.id ? 'text-blue-600/70' : 'text-slate-400'}`}>
+                    <span className="truncate font-normal">
+                      {session.ticket_id || session.title || 'Untitled Session'}
+                    </span>
+                    <span className={`text-[10px] font-normal ${currentSessionId === session.id ? 'text-blue-600/70' : 'text-slate-400'}`}>
                       {formatRelativeTime(session.updated_at)}
                     </span>
+                    {session.ticket_id && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+                          Created
+                        </span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100/70 px-2 py-0.5 text-[10px] font-semibold text-slate-500">
+                          Feedback {feedbackBySessionId[session.id] ? "✓" : "○"}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Delete Button */}

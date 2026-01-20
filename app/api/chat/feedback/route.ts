@@ -11,12 +11,26 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const sessionId = searchParams.get('sessionId');
   const ticketId = searchParams.get('ticketId');
+  const summary = ['1', 'true', 'yes'].includes((searchParams.get('summary') || '').toLowerCase());
 
-  if (!sessionId) {
+  if (!sessionId && !summary) {
     return NextResponse.json({ error: 'Missing sessionId' }, { status: 400 });
   }
 
   try {
+    if (summary) {
+      const params = [`user_id=eq.${session.user.id}`];
+      if (sessionId) {
+        params.push(`session_id=eq.${sessionId}`);
+      }
+      if (ticketId) {
+        params.push(`ticket_id=eq.${ticketId}`);
+      }
+      params.push('select=session_id,ticket_id,rating');
+      const feedback = await supabaseRequest('chat_feedback', { params: params.join('&') });
+      return NextResponse.json(feedback);
+    }
+
     const sessionData = await supabaseRequest('chat_sessions', {
       params: `id=eq.${sessionId}&user_id=eq.${session.user.id}`,
     });
